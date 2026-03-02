@@ -213,11 +213,45 @@ export default function ProfilePage() {
                                 <ExternalLink size={14} className="ml-auto" />
                             </summary>
                             <div className="step-content">
-                                <ol>
-                                    <li>Open <strong>Gmail Settings</strong> &gt; <strong>Forwarding</strong>.</li>
-                                    <li>Click <strong>Add a forwarding address</strong>.</li>
-                                    <li>Paste your alias and verify the link on your <a href="/dashboard">Dashboard</a>.</li>
-                                </ol>
+                                <div className="gmail-setup-guide" style={{ fontSize: '0.875rem' }}>
+                                    <div className="setup-part">
+                                        <p style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-primary)' }}>PART 1 — Enable Forwarding</p>
+                                        <ol style={{ paddingLeft: '1.25rem', marginBottom: '1rem' }}>
+                                            <li>Open <strong>Gmail Settings</strong> &gt; <strong>Forwarding</strong>.</li>
+                                            <li>Click <strong>Add a forwarding address</strong>.</li>
+                                            <li>Paste your alias and verify the link above.</li>
+                                        </ol>
+                                        <p style={{ fontSize: '0.75rem', color: '#ffab00', marginBottom: '1rem' }}>
+                                            ⚠️ Do NOT choose "Forward a copy of all incoming mail".
+                                        </p>
+                                    </div>
+                                    <div className="setup-part" style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1rem' }}>
+                                        <p style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-primary)' }}>PART 2 — Create the Job Filter</p>
+                                        <ol style={{ paddingLeft: '1.25rem' }}>
+                                            <li>In Gmail, click the search bar filter icon.</li>
+                                            <li>
+                                                Paste this in <strong>"Has the words"</strong>:
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px', background: 'rgba(255,255,255,0.05)', padding: '4px 8px', borderRadius: '4px' }}>
+                                                    <code style={{ fontSize: '0.7rem', color: 'var(--primary-color)', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                        (subject:job OR subject:career OR subject:position OR subject:interview OR subject:offer OR recruiter OR hiring OR "job application" OR "career opportunity")
+                                                    </code>
+                                                    <button
+                                                        onClick={() => {
+                                                            navigator.clipboard.writeText('(subject:job OR subject:career OR subject:position OR subject:interview OR subject:offer OR recruiter OR hiring OR "job application" OR "career opportunity")');
+                                                            alert('Filter copied!');
+                                                        }}
+                                                        style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
+                                                    >
+                                                        <Copy size={12} />
+                                                    </button>
+                                                </div>
+                                            </li>
+                                            <li>Click <strong>Create filter</strong>.</li>
+                                            <li>Check <strong>Forward it to</strong> and select your alias.</li>
+                                            <li>Click <strong>Create filter</strong>.</li>
+                                        </ol>
+                                    </div>
+                                </div>
                             </div>
                         </details>
 

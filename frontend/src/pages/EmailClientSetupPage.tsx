@@ -169,36 +169,72 @@ export default function EmailClientSetupPage() {
 
                         <div className="instructions-box">
                             {client === 'gmail' ? (
-                                <ol>
-                                    <li>Open Gmail settings (gear icon) &gt; See all settings.</li>
-                                    <li>Go to the <strong>Forwarding and POP/IMAP</strong> tab.</li>
-                                    <li>Click <strong>Add a forwarding address</strong>.</li>
-                                    <li>
-                                        Enter your alias:
-                                        <div className="copy-code-wrapper" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginLeft: '8px' }}>
-                                            <code className="highlight-code" style={{ margin: 0 }}>{alias}@trackyjobby.com</code>
-                                            <button
-                                                className="copy-icon-btn"
-                                                onClick={() => handleCopy(`${alias}@trackyjobby.com`)}
-                                                title="Copy to clipboard"
-                                                style={{
-                                                    background: 'none',
-                                                    border: 'none',
-                                                    color: 'var(--text-secondary)',
-                                                    cursor: 'pointer',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    padding: '4px',
-                                                    borderRadius: '4px',
-                                                    transition: 'all 0.2s'
-                                                }}
-                                            >
-                                                {copied ? <Check size={14} className="text-success" /> : <Copy size={14} />}
-                                            </button>
+                                <div className="gmail-setup-guide">
+                                    <div className="setup-part">
+                                        <h4>PART 1 — Enable Forwarding</h4>
+                                        <ol>
+                                            <li>Open <strong>Gmail settings</strong> (gear icon) &gt; <strong>See all settings</strong>.</li>
+                                            <li>Go to the <strong>Forwarding and POP/IMAP</strong> tab.</li>
+                                            <li>Click <strong>Add a forwarding address</strong>.</li>
+                                            <li>
+                                                Enter your alias:
+                                                <div className="copy-code-wrapper" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginLeft: '8px' }}>
+                                                    <code className="highlight-code" style={{ margin: 0 }}>{alias}@trackyjobby.com</code>
+                                                    <button
+                                                        className="copy-icon-btn"
+                                                        onClick={() => handleCopy(`${alias}@trackyjobby.com`)}
+                                                        title="Copy to clipboard"
+                                                        style={{
+                                                            background: 'none',
+                                                            border: 'none',
+                                                            color: 'var(--text-secondary)',
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            padding: '4px',
+                                                            borderRadius: '4px',
+                                                            transition: 'all 0.2s'
+                                                        }}
+                                                    >
+                                                        {copied ? <Check size={14} className="text-success" /> : <Copy size={14} />}
+                                                    </button>
+                                                </div>
+                                            </li>
+                                            <li>Click <strong>Next</strong> &gt; <strong>Proceed</strong>. Gmail will send a confirmation link to us.</li>
+                                        </ol>
+                                        <div className="warning-note" style={{ fontSize: '0.8rem', color: '#ffab00', marginTop: '0.5rem', display: 'flex', gap: '8px' }}>
+                                            <CheckCircle size={14} style={{ flexShrink: 0 }} />
+                                            <span>After verifying, do <strong>NOT</strong> chose "Forward a copy of all incoming mail". We will use a filter instead.</span>
                                         </div>
-                                    </li>
-                                    <li>Click Next &gt; Proceed. Gmail will send a confirmation code to us.</li>
-                                </ol>
+                                    </div>
+
+                                    <div className="setup-part" style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                                        <h4>PART 2 — Create the Job Filter</h4>
+                                        <ol>
+                                            <li>In Gmail, click the <strong>search bar</strong>.</li>
+                                            <li>Click the <strong>Filter icon</strong> (right side of search bar).</li>
+                                            <li>
+                                                Paste this in the <strong>"Has the words"</strong> field:
+                                                <div className="copy-code-wrapper" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px', background: 'rgba(255,255,255,0.05)', padding: '6px 10px', borderRadius: '4px' }}>
+                                                    <code style={{ fontSize: '0.75rem', color: 'var(--primary-color)', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                        (subject:job OR subject:career OR subject:position OR subject:interview OR subject:offer OR recruiter OR hiring OR "job application" OR "career opportunity")
+                                                    </code>
+                                                    <button
+                                                        className="copy-icon-btn"
+                                                        onClick={() => handleCopy('(subject:job OR subject:career OR subject:position OR subject:interview OR subject:offer OR recruiter OR hiring OR "job application" OR "career opportunity")')}
+                                                        style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
+                                                    >
+                                                        {copied ? <Check size={14} className="text-success" /> : <Copy size={14} />}
+                                                    </button>
+                                                </div>
+                                            </li>
+                                            <li>Click <strong>Create filter</strong>.</li>
+                                            <li>Check <strong>Forward it to</strong> and select your <code>{alias}@trackyjobby.com</code> address.</li>
+                                            <li>(Optional) Check <strong>Never send it to Spam</strong>.</li>
+                                            <li>Click <strong>Create filter</strong>.</li>
+                                        </ol>
+                                    </div>
+                                </div>
                             ) : (
                                 <p>
                                     Set up a forwarding rule in your email client to forward all job-related emails to:
