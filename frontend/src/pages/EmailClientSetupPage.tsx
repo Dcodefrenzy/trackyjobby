@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, CheckCircle, ArrowRight, RefreshCcw, Send, Copy, Check } from 'lucide-react';
+import { Mail, CheckCircle, ArrowRight, RefreshCcw, Send, Copy, Check, Settings } from 'lucide-react';
 import { setupForwarder, getMe, getForwardingVerification } from '../api/client';
 import './EmailClientSetupPage.css';
 
@@ -236,41 +236,12 @@ export default function EmailClientSetupPage() {
                                             ></iframe>
                                         </div>
 
-                                        <h4>New Outlook & Web Version Setup</h4>
-                                        <p style={{ fontSize: '0.875rem', color: 'var(--text-primary)', fontWeight: 600, marginBottom: '0.75rem' }}>Follow these steps:</p>
+                                        <h4>Microsoft Outlook Setup</h4>
                                         <ol>
-                                            <li>At the top window of the new Outlook, select the <strong>Settings</strong> gear icon.</li>
-                                            <li>Go to <strong>Mail</strong> &gt; <strong>Forwarding</strong>.</li>
-                                            <li>Toggle the <strong>Enable forwarding</strong> switch.</li>
+                                            <li>At the top window of the new Outlook, select <strong>Settings</strong> <Settings size={14} style={{ display: 'inline', verticalAlign: 'middle', opacity: 0.7 }} /> .</li>
+                                            <li>Select <strong>Mail</strong> &gt; <strong>Forwarding</strong>.</li>
                                             <li>
-                                                Enter your alias:
-                                                <div className="copy-code-wrapper" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginLeft: '8px' }}>
-                                                    <code className="highlight-code" style={{ margin: 0 }}>{alias}@trackyjobby.com</code>
-                                                    <button
-                                                        className="copy-icon-btn"
-                                                        onClick={() => handleCopy(`${alias}@trackyjobby.com`)}
-                                                        title="Copy to clipboard"
-                                                        style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '4px', borderRadius: '4px', transition: 'all 0.2s' }}
-                                                    >
-                                                        {copied ? <Check size={14} className="text-success" /> : <Copy size={14} />}
-                                                    </button>
-                                                </div>
-                                            </li>
-                                            <li>Select <strong>Keep a copy of forwarded messages</strong> (Recommended).</li>
-                                            <li>Click <strong>Save</strong>.</li>
-                                        </ol>
-                                    </div>
-                                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.5rem', marginBottom: '1.5rem' }}>
-                                        <h4>Classic Outlook (Desktop App) Setup</h4>
-                                        <p style={{ fontSize: '0.875rem', color: 'var(--text-primary)', fontWeight: 600, marginBottom: '0.75rem', opacity: 0.9 }}>For older desktop versions:</p>
-                                        <ol>
-                                            <li>Select the <strong>Home</strong> tab &gt; <strong>Rules</strong> &gt; <strong>Manage Rules & Alerts</strong>.</li>
-                                            <li>Click <strong>New Rule...</strong> &gt; <strong>Apply rule on messages I receive</strong> &gt; <strong>Next</strong>.</li>
-                                            <li>Leave conditions blank to forward *all* mail (or specify conditions), click <strong>Next</strong> &gt; <strong>Yes</strong>.</li>
-                                            <li>Check <strong>forward it to people or public group</strong>.</li>
-                                            <li>Click the underlined link <strong>people or public group</strong> in Step 2.</li>
-                                            <li>
-                                                In the "To" field, enter:
+                                                Toggle the <strong>Enable forwarding</strong> switch, enter the forwarding email address:
                                                 <div className="copy-code-wrapper" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginLeft: '8px', marginTop: '4px' }}>
                                                     <code className="highlight-code" style={{ margin: 0 }}>{alias}@trackyjobby.com</code>
                                                     <button
@@ -283,7 +254,7 @@ export default function EmailClientSetupPage() {
                                                     </button>
                                                 </div>
                                             </li>
-                                            <li>Click <strong>OK</strong> &gt; <strong>Next</strong> &gt; <strong>Next</strong> &gt; give it a name, check <strong>Turn on this rule</strong>, and click <strong>Finish</strong>.</li>
+                                            <li>Select <strong>Keep a copy of forwarded messages</strong> and select <strong>Save</strong>.</li>
                                         </ol>
                                     </div>
                                 </div>
