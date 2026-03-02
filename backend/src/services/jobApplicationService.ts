@@ -9,15 +9,38 @@ export async function processJobApplication(userId: string, jobData: JobData, _f
     const jobTitle = jobData.jobTitle || 'Unknown';
     // ─── Resolve Company ───
     let companyId;
-    const { data: existingCompany } = await supabase
-        .from('companies')
-        .select('id')
-        .ilike('name', jobData.companyName)
-        .single();
 
-    if (existingCompany) {
-        companyId = existingCompany.id;
-    } else {
+    // Try matching by domain first (it's more reliable than name)
+    if (jobData.companyDomain) {
+        const { data: domainMatch } = await supabase
+            .from('companies')
+            .select('id')
+            .ilike('domain', jobData.companyDomain)
+            .limit(1)
+            .maybeSingle();
+
+        if (domainMatch) {
+            companyId = domainMatch.id;
+            console.log(`🔗 Matched company "${jobData.companyName}" by domain: ${jobData.companyDomain}`);
+        }
+    }
+
+    // Fallback to name match if no domain match or no domain provided
+    if (!companyId) {
+        const { data: nameMatch } = await supabase
+            .from('companies')
+            .select('id')
+            .ilike('name', jobData.companyName)
+            .maybeSingle();
+
+        if (nameMatch) {
+            companyId = nameMatch.id;
+            console.log(`🔗 Matched company "${jobData.companyName}" by name.`);
+        }
+    }
+
+    // Create new company if still no match
+    if (!companyId) {
         const logoUrl = jobData.companyDomain ? `https://cdn.brandfetch.io/${jobData.companyDomain}?c=1idpPzZ5e4dgNRWVKYA` : null;
         const { data: newCompany, error: companyErr } = await supabase
             .from('companies')
@@ -34,6 +57,7 @@ export async function processJobApplication(userId: string, jobData: JobData, _f
             throw companyErr;
         }
         companyId = newCompany.id;
+        console.log(`🆕 Created new company: ${jobData.companyName}`);
     }
 
     // ─── Duplicate Check Strategy ───
