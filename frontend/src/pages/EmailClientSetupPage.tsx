@@ -222,14 +222,10 @@ export default function EmailClientSetupPage() {
                                     <div className="instructions-box" style={{ minHeight: '300px', border: 'none', background: 'transparent', padding: 0 }}>
                                         {showVideo ? (
                                             <div className="video-wrapper" style={{ borderRadius: '12px', overflow: 'hidden', background: '#000', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                                <video
+                                                <img
                                                     src="https://storage.googleapis.com/support-kms-prod/Cm6cYtX7pQvTaMzx3ADskquczoegpK3vShee"
-                                                    controls
-                                                    autoPlay
-                                                    muted
-                                                    loop
-                                                    playsInline
-                                                    style={{ width: '100%', display: 'block' }}
+                                                    alt="Gmail Forwarding Tutorial"
+                                                    style={{ width: '100%', display: 'block', height: 'auto' }}
                                                 />
                                             </div>
                                         ) : (
