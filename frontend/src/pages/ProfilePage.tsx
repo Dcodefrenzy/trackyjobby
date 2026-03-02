@@ -369,6 +369,14 @@ export default function ProfilePage() {
                             <div className="step-content">
                                 <div className="outlook-setup-guide" style={{ fontSize: '0.875rem' }}>
                                     <div className="setup-part" style={{ marginBottom: '1.5rem' }}>
+                                        <div className="safe-forwarding-notice" style={{ background: 'rgba(56, 189, 248, 0.05)', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '12px', borderRadius: '8px', marginBottom: '1.5rem' }}>
+                                            <p style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, color: 'var(--info-color)', marginBottom: '4px', fontSize: '0.85rem' }}>
+                                                <ShieldCheck size={16} /> Privacy First: Stay in Control
+                                            </p>
+                                            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5', margin: 0 }}>
+                                                Don't want to forward all your emails? <strong>You don't have to!</strong> Instead of setting up global forwarding, you can use <strong>Outlook Rules</strong> to only forward emails that match job-related keywords (like "Job offer", "Interview", etc.) to your TrackyJobby alias.
+                                            </p>
+                                        </div>
                                         <div className="tutorial-visual" style={{ marginBottom: '1rem', borderRadius: '8px', overflow: 'hidden', background: '#000', border: '1px solid rgba(255,255,255,0.1)', aspectRatio: '16/9' }}>
                                             <iframe
                                                 width="100%"

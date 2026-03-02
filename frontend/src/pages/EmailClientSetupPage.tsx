@@ -272,7 +272,17 @@ export default function EmailClientSetupPage() {
                                             ></iframe>
                                         </div>
 
+                                        <div className="safe-forwarding-notice" style={{ background: 'rgba(56, 189, 248, 0.05)', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '12px', borderRadius: '8px', marginBottom: '1.5rem' }}>
+                                            <p style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, color: 'var(--info-color)', marginBottom: '4px', fontSize: '0.9rem' }}>
+                                                <ShieldCheck size={16} /> Privacy First: Stay in Control
+                                            </p>
+                                            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                                                Don't want to forward all your emails? <strong>You don't have to!</strong> Instead of setting up global forwarding, you can use <strong>Outlook Rules</strong> to only forward emails that match job-related keywords (like "Job offer", "Interview", etc.) to your TrackyJobby alias.
+                                            </p>
+                                        </div>
+
                                         <h4>Microsoft Outlook Setup</h4>
+                                        <p style={{ fontSize: '0.875rem', color: 'var(--text-primary)', fontWeight: 600, marginBottom: '0.75rem' }}>Follow these steps:</p>
                                         <ol>
                                             <li>At the top window of the new Outlook, select <strong>Settings</strong> <Settings size={14} style={{ display: 'inline', verticalAlign: 'middle', opacity: 0.7 }} /> .</li>
                                             <li>Select <strong>Mail</strong> &gt; <strong>Forwarding</strong>.</li>
