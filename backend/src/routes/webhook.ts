@@ -26,17 +26,20 @@ router.post('/stripe', async (req: Request, res: Response) => {
     console.log(`🔍 [STRIPE] Raw Body Present: ${!!(req as any).rawBody}`);
 
     try {
+        const body = (req as any).rawBody || req.body;
         event = stripe.webhooks.constructEvent(
-            (req as any).rawBody,
+            body,
             sig,
             webhookSecret
         );
     } catch (err: any) {
         console.error(`❌ [STRIPE] Webhook signature verification failed: ${err.message}`);
-        // Log more details about what might be wrong
-        if (!webhookSecret) console.error('❌ [STRIPE] Missing STRIPE_WEBHOOK_SECRET in .env');
-        if (!sig) console.error('❌ [STRIPE] Missing stripe-signature header');
-        if (!(req as any).rawBody) console.error('❌ [STRIPE] Missing req.rawBody - Check index.ts middleware');
+        console.error('--- STRIPE DEBUG START ---');
+        console.error('Expected Signature Suffix:', webhookSecret.slice(-4));
+        console.error('Signature Received (Start):', sig?.substring(0, 10));
+        console.error('Body Type Received:', typeof req.body);
+        console.error('Is Buffer:', Buffer.isBuffer(req.body));
+        console.error('--- STRIPE DEBUG END ---');
 
         return res.status(400).send(`Webhook Error: ${err.message}`);
     }
