@@ -35,7 +35,10 @@ router.post('/create-session', authenticate, async (req: any, res) => {
         res.json({ url: session.url });
     } catch (err: any) {
         console.error('❌ [PAYMENT] Error creating session:', err.message);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({
+            error: `Stripe Checkout Failed: ${err.message}`,
+            details: process.env.NODE_ENV === 'development' ? err.stack : undefined
+        });
     }
 });
 

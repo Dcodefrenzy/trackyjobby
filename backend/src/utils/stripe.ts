@@ -27,9 +27,17 @@ export const STRIPE_PLANS = {
 
 export async function createCheckoutSession(userId: string, userEmail: string, planId: string) {
     const plan = Object.values(STRIPE_PLANS).find(p => p.id === planId);
+    const baseUrl = process.env.APP_URL || 'https://trackyjobby.com';
 
     if (!plan) {
-        throw new Error('Invalid plan ID');
+        throw new Error(`Invalid plan ID: ${planId}`);
+    }
+
+    console.log(`ℹ️ [STRIPE] Creating checkout session for ${userEmail} (Plan: ${planId})`);
+
+    // Check if we are using a test key with what might be live prices
+    if (process.env.STRIPE_SECRET_KEY && process.env.STRIPE_SECRET_KEY.startsWith('sk_test_')) {
+        console.warn('⚠️ [STRIPE] Using TEST MODE secret key. Ensure price IDs match.');
     }
 
     const session = await stripe.checkout.sessions.create({
@@ -50,8 +58,8 @@ export async function createCheckoutSession(userId: string, userEmail: string, p
                 planId,
             },
         },
-        success_url: `${process.env.APP_URL || 'http://localhost:5173'}/dashboard?payment=success`,
-        cancel_url: `${process.env.APP_URL || 'http://localhost:5173'}/plan-selection?payment=cancelled`,
+        success_url: `${baseUrl}/dashboard?payment=success`,
+        cancel_url: `${baseUrl}/plan-selection?payment=cancelled`,
         metadata: {
             userId,
             planId,
