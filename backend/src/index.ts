@@ -17,14 +17,14 @@ app.use(cors());
 
 // --- WEBHOOKS (MUST go BEFORE express.json() to preserve raw body) ---
 // We handle Stripe with express.raw() to avoid signature verification failures.
-app.post('/api/webhook/stripe', express.raw({ type: 'application/json' }), webhookRoutes);
+app.use('/api/webhook/stripe', express.raw({ type: 'application/json' }));
 
 // Global JSON parsing for all other routes
 app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/webhook/inbound', webhookRoutes); // Resend still uses JSON
+app.use('/api/webhook', webhookRoutes);
 app.use('/api/jobs', jobsRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/payment', paymentRoutes);
