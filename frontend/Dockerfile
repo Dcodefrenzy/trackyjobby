@@ -1,33 +1,20 @@
-FROM node:20-alpine AS builder
+# Build stage
+FROM node:20-alpine as build
 
-# Set working directory
 WORKDIR /app
 
-# Accept VITE_API_URL as a build arg so axios knows where to route
-ARG VITE_API_URL=/
-ENV VITE_API_URL=$VITE_API_URL
-
-# Copy package and install dependencies
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
-# Copy full source and build
 COPY . .
 RUN npm run build
 
-# Production server using Nginx
-FROM nginx:alpine
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Production stage
+FROM nginx:stable-alpine
 
-# Replace default Nginx config to support React Router (SPA fallback)
-RUN echo -e "server {\n\
-    listen 80;\n\
-    location / {\n\
-        root /usr/share/nginx/html;\n\
-        index index.html index.htm;\n\
-        try_files \$uri \$uri/ /index.html;\n\
-    }\n\
-}" > /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist /usr/share/nginx/html
 
+# Default Nginx port
 EXPOSE 80
+
 CMD ["nginx", "-g", "daemon off;"]
