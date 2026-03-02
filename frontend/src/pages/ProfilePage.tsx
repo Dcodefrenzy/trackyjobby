@@ -1,14 +1,13 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { User, Mail, LogOut, Copy, ExternalLink, ShieldCheck, MailWarning, ArrowLeft, CreditCard, Loader2 } from 'lucide-react';
 import { createPortalSession } from '../api/client';
 import './ProfilePage.css';
 
 export default function ProfilePage() {
-    const { user, logout, refreshUser } = useAuth();
+    const { user, logout } = useAuth();
     const navigate = useNavigate();
-    const location = useLocation();
     const [isPortalLoading, setIsPortalLoading] = useState(false);
 
     // No logic needed here for portal return as it now redirects to dashboard
