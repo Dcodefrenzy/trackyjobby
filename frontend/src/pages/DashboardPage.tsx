@@ -120,33 +120,6 @@ export default function DashboardPage() {
                     </div>
                 </section>
 
-                {/* Accepted Offers */}
-                {(statusFilter === 'All status' || statusFilter === 'Accepted') && (
-                    <section className="app-section">
-                        <div className="section-header flex-between">
-                            <div>
-                                <h3>Accepted Offers</h3>
-                                <p>Applications where you've accepted the offer</p>
-                            </div>
-                            <span className="badge badge-success">{acceptedApps.length} accepted</span>
-                        </div>
-                        {acceptedApps.length === 0 ? (
-                            <div className="empty-state" style={{ marginBottom: '1rem' }}>
-                                <Check size={32} className="text-muted" />
-                                <h4>No accepted applications</h4>
-                                <p className="text-muted text-sm">Job offers will appear here</p>
-                            </div>
-                        ) : (
-                            <div className="apps-grid animate-fade-in" style={{ marginBottom: '1.5rem' }}>
-                                {/* TODO Map Accepted cards here if needed */}
-                                <p style={{ padding: '1rem', color: 'var(--text-secondary)' }}>You have {acceptedApps.length} offer(s)!</p>
-                            </div>
-                        )}
-                    </section>
-                )}
-
-
-
                 {/* Active Apps */}
                 {(statusFilter === 'All status' || statusFilter === 'Applied' || statusFilter === 'Interview' || statusFilter === 'Offer') && (
                     <section className="app-section">
@@ -219,6 +192,31 @@ export default function DashboardPage() {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+                        )}
+                    </section>
+                )}
+
+                {/* Accepted Offers */}
+                {(statusFilter === 'All status' || statusFilter === 'Accepted') && (
+                    <section className="app-section">
+                        <div className="section-header flex-between">
+                            <div>
+                                <h3>Accepted Offers</h3>
+                                <p>Applications where you've accepted the offer</p>
+                            </div>
+                            <span className="badge badge-success">{acceptedApps.length} accepted</span>
+                        </div>
+                        {acceptedApps.length === 0 ? (
+                            <div className="empty-state" style={{ marginBottom: '1rem' }}>
+                                <Check size={32} className="text-muted" />
+                                <h4>No accepted applications</h4>
+                                <p className="text-muted text-sm">Job offers will appear here</p>
+                            </div>
+                        ) : (
+                            <div className="apps-grid animate-fade-in" style={{ marginBottom: '1.5rem' }}>
+                                {/* TODO Map Accepted cards here if needed */}
+                                <p style={{ padding: '1rem', color: 'var(--text-secondary)' }}>You have {acceptedApps.length} offer(s)!</p>
                             </div>
                         )}
                     </section>
@@ -369,7 +367,6 @@ export default function DashboardPage() {
 
                         <div className="modal-footer">
                             <button className="secondary-btn" onClick={() => setIsModalOpen(false)}>Close</button>
-                            <button className="primary-btn">View Email Thread</button>
                         </div>
                     </div>
                 </div>
