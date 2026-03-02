@@ -141,3 +141,20 @@
     background-color: var(--border-color);
     border-radius: 10px;
 }
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .right-sidebar {
+        display: none;
+    }
+
+    .main-content {
+        padding: 2rem 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        padding: 1.5rem 1rem;
+    }
+}

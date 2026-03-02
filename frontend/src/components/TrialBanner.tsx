@@ -22,7 +22,8 @@ const TrialBanner: React.FC = () => {
             borderRadius: '8px',
             marginBottom: '2rem',
             display: 'flex',
-            alignItems: 'center',
+            flexDirection: window.innerWidth < 768 ? 'column' : 'row',
+            alignItems: window.innerWidth < 768 ? 'flex-start' : 'center',
             gap: '0.75rem',
             fontSize: '0.875rem',
             fontWeight: 500

@@ -325,6 +325,7 @@
 @media (max-width: 768px) {
 
     .profile-info-card,
+    .subscription-card,
     .alias-card {
         grid-column: span 12;
     }

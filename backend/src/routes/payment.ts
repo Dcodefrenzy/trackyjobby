@@ -60,12 +60,26 @@ router.post('/create-portal-session', authenticate, async (req: any, res) => {
         }
 
         // 2. Create the portal session
-        const { createPortalSession } = require('../utils/stripe');
-        const session = await createPortalSession(user.stripe_customer_id);
+        const { createPortalSession: stripeCreatePortal } = require('../utils/stripe');
+        const session = await stripeCreatePortal(user.stripe_customer_id);
 
         res.json({ url: session.url });
     } catch (err: any) {
         console.error('❌ [PAYMENT] Error creating portal session:', err.message);
+
+        // If customer ID is invalid (e.g. Test ID in Live mode), clear it from DB
+        if (err.message && err.message.toLowerCase().includes('no such customer')) {
+            console.log(`⚠️ [PAYMENT] Clearing invalid customer ID ${userId}`);
+            await supabase
+                .from('users')
+                .update({ stripe_customer_id: null })
+                .eq('id', userId);
+
+            return res.status(400).json({
+                error: 'Your customer ID was invalid or from a different environment. We have reset it. Please try again to trigger a new checkout.'
+            });
+        }
+
         res.status(500).json({ error: err.message });
     }
 });

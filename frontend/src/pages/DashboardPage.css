@@ -608,3 +608,29 @@
     background: var(--success-light);
     color: var(--success-color);
 }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .metrics-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .apps-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .job-card {
+        padding: 1.25rem;
+    }
+
+    .modal-content {
+        padding: 1.5rem;
+    }
+
+    .modal-details-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 1rem;
+    }
+}
