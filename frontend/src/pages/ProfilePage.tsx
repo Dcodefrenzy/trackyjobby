@@ -10,7 +10,7 @@ export default function ProfilePage() {
     const navigate = useNavigate();
     const [isPortalLoading, setIsPortalLoading] = useState(false);
     const [verificationUrl, setVerificationUrl] = useState<string | null>(null);
-    const [showVideo, setShowVideo] = useState(false);
+
 
     // Poll for Gmail verification link if instructions are open
     useEffect(() => {
@@ -214,66 +214,28 @@ export default function ProfilePage() {
                                 <ExternalLink size={14} className="ml-auto" />
                             </summary>
                             <div className="step-content">
-                                <div className="setup-tabs" style={{ display: 'flex', gap: '8px', marginBottom: '1rem' }}>
-                                    <button
-                                        className={`mini-tab ${!showVideo ? 'active' : ''}`}
-                                        onClick={() => setShowVideo(false)}
-                                        style={{
-                                            flex: 1,
-                                            padding: '6px',
-                                            borderRadius: '6px',
-                                            border: '1px solid rgba(255,255,255,0.1)',
-                                            background: !showVideo ? 'rgba(255,255,255,0.1)' : 'transparent',
-                                            color: !showVideo ? 'var(--primary-color)' : 'var(--text-secondary)',
-                                            fontSize: '0.75rem',
-                                            fontWeight: 600,
-                                            cursor: 'pointer'
-                                        }}
-                                    >
-                                        Written
-                                    </button>
-                                    <button
-                                        className={`mini-tab ${showVideo ? 'active' : ''}`}
-                                        onClick={() => setShowVideo(true)}
-                                        style={{
-                                            flex: 1,
-                                            padding: '6px',
-                                            borderRadius: '6px',
-                                            border: '1px solid rgba(255,255,255,0.1)',
-                                            background: showVideo ? 'rgba(255,255,255,0.1)' : 'transparent',
-                                            color: showVideo ? 'var(--primary-color)' : 'var(--text-secondary)',
-                                            fontSize: '0.75rem',
-                                            fontWeight: 600,
-                                            cursor: 'pointer'
-                                        }}
-                                    >
-                                        Video
-                                    </button>
-                                </div>
-
                                 <div className="gmail-setup-guide" style={{ fontSize: '0.875rem' }}>
-                                    {showVideo ? (
-                                        <div className="video-wrapper" style={{ borderRadius: '8px', overflow: 'hidden', background: '#000', border: '1px solid rgba(255,255,255,0.1)', marginBottom: '1rem' }}>
+                                    <div className="setup-part" style={{ marginBottom: '1.5rem' }}>
+                                        <div className="tutorial-visual" style={{ marginBottom: '1rem', borderRadius: '8px', overflow: 'hidden', background: '#000', border: '1px solid rgba(255,255,255,0.1)' }}>
                                             <img
                                                 src="https://storage.googleapis.com/support-kms-prod/Cm6cYtX7pQvTaMzx3ADskquczoegpK3vShee"
                                                 alt="Gmail Forwarding Tutorial"
                                                 style={{ width: '100%', display: 'block', height: 'auto' }}
                                             />
                                         </div>
-                                    ) : (
-                                        <div className="setup-part">
-                                            <p style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-primary)' }}>PART 1 — Enable Forwarding</p>
-                                            <ol style={{ paddingLeft: '1.25rem', marginBottom: '1rem' }}>
-                                                <li>Open <strong>Gmail Settings</strong> &gt; <strong>Forwarding</strong>.</li>
-                                                <li>Click <strong>Add a forwarding address</strong>.</li>
-                                                <li>Paste your alias: <code>{user.forwardingEmail}</code></li>
-                                            </ol>
-                                            <div style={{ background: 'rgba(255,171,0,0.05)', padding: '10px', borderRadius: '6px', fontSize: '0.75rem', color: '#ffab00' }}>
-                                                <MailWarning size={14} style={{ marginRight: '6px', verticalAlign: 'middle' }} />
-                                                <span>After adding the address, stay on this page. The verification link will appear at the top.</span>
-                                            </div>
-                                        </div>
-                                    )}
+                                        <p style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-primary)' }}>Set up forwarding:</p>
+                                        <ol style={{ paddingLeft: '1.25rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                                            <li>Open <strong>Gmail settings</strong> &gt; <strong>See all settings</strong>.</li>
+                                            <li>Go to <strong>Forwarding and POP/IMAP</strong>.</li>
+                                            <li>Click <strong>Add a forwarding address</strong>.</li>
+                                            <li>Enter <code>{user.forwardingEmail}</code> and click <strong>Next</strong>.</li>
+                                            <li>Stay on this page until you see the verification link above.</li>
+                                        </ol>
+                                    </div>
+                                    <div style={{ background: 'rgba(255,171,0,0.05)', padding: '10px', borderRadius: '6px', fontSize: '0.75rem', color: '#ffab00', marginBottom: '1rem' }}>
+                                        <MailWarning size={14} style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+                                        <span>After adding the address, stay on this page. The verification link will appear at the top.</span>
+                                    </div>
 
                                     {verificationUrl && (
                                         <div className="setup-part" style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1rem', marginTop: '1rem' }}>

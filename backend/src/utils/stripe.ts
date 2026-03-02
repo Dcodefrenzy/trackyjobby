@@ -62,11 +62,16 @@ export async function createCheckoutSession(userId: string, userEmail: string, p
 }
 
 export async function createPortalSession(customerId: string) {
-    const session = await stripe.billingPortal.sessions.create({
+    const portalOptions: Stripe.BillingPortal.SessionCreateParams = {
         customer: customerId,
         return_url: `${process.env.APP_URL || 'http://localhost:5174'}/dashboard?portal=return`,
-        configuration: process.env.STRIPE_PORTAL_CONFIG_ID,
-    });
+    };
+
+    if (process.env.STRIPE_PORTAL_CONFIG_ID) {
+        portalOptions.configuration = process.env.STRIPE_PORTAL_CONFIG_ID;
+    }
+
+    const session = await stripe.billingPortal.sessions.create(portalOptions);
     return session;
 }
 

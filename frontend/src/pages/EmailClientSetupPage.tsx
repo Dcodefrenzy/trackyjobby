@@ -1,6 +1,7 @@
+```
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, CheckCircle, ArrowRight, RefreshCcw, Send, Copy, Check, ExternalLink, ShieldCheck } from 'lucide-react';
+import { Mail, CheckCircle, ArrowRight, RefreshCcw, Send, Copy, Check } from 'lucide-react';
 import { setupForwarder, getMe, getForwardingVerification } from '../api/client';
 import './EmailClientSetupPage.css';
 
@@ -53,7 +54,7 @@ export default function EmailClientSetupPage() {
         }
     };
 
-    const [showVideo, setShowVideo] = useState(false);
+
 
     // Poll for the Gmail verification link when the user clicks "I have added the address"
     useEffect(() => {
@@ -145,7 +146,7 @@ export default function EmailClientSetupPage() {
                             {['Gmail', 'Outlook', 'Apple Mail', 'Other'].map(c => (
                                 <button
                                     key={c}
-                                    className={`client-btn ${client === c.toLowerCase() ? 'active' : ''}`}
+                                    className={`client - btn ${ client === c.toLowerCase() ? 'active' : '' } `}
                                     onClick={() => setClient(c.toLowerCase())}
                                 >
                                     {c}
@@ -171,106 +172,55 @@ export default function EmailClientSetupPage() {
 
                         <div className="instructions-box">
                             {client === 'gmail' ? (
-                                <>
-                                    <div className="setup-tabs" style={{ display: 'flex', gap: '10px', marginBottom: '1.5rem' }}>
-                                        <button
-                                            className={`tab-btn ${!showVideo ? 'active' : ''}`}
-                                            onClick={() => setShowVideo(false)}
-                                            style={{
-                                                flex: 1,
-                                                padding: '10px',
-                                                borderRadius: '8px',
-                                                border: '1px solid rgba(255,255,255,0.1)',
-                                                background: !showVideo ? 'rgba(255,255,255,0.1)' : 'transparent',
-                                                color: !showVideo ? 'var(--primary-color)' : 'var(--text-secondary)',
-                                                fontSize: '0.875rem',
-                                                fontWeight: 600,
-                                                cursor: 'pointer',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                gap: '8px'
-                                            }}
-                                        >
-                                            <ExternalLink size={16} />
-                                            Written Steps
-                                        </button>
-                                        <button
-                                            className={`tab-btn ${showVideo ? 'active' : ''}`}
-                                            onClick={() => setShowVideo(true)}
-                                            style={{
-                                                flex: 1,
-                                                padding: '10px',
-                                                borderRadius: '8px',
-                                                border: '1px solid rgba(255,255,255,0.1)',
-                                                background: showVideo ? 'rgba(255,255,255,0.1)' : 'transparent',
-                                                color: showVideo ? 'var(--primary-color)' : 'var(--text-secondary)',
-                                                fontSize: '0.875rem',
-                                                fontWeight: 600,
-                                                cursor: 'pointer',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                gap: '8px'
-                                            }}
-                                        >
-                                            <ShieldCheck size={16} />
-                                            Video Tutorial
-                                        </button>
-                                    </div>
+                                <div className="gmail-setup-guide">
+                                    <div className="setup-part">
+                                        <h4>Gmail Forwarding Setup</h4>
 
-                                    <div className="instructions-box" style={{ minHeight: '300px', border: 'none', background: 'transparent', padding: 0 }}>
-                                        {showVideo ? (
-                                            <div className="video-wrapper" style={{ borderRadius: '12px', overflow: 'hidden', background: '#000', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                                <img
-                                                    src="https://storage.googleapis.com/support-kms-prod/Cm6cYtX7pQvTaMzx3ADskquczoegpK3vShee"
-                                                    alt="Gmail Forwarding Tutorial"
-                                                    style={{ width: '100%', display: 'block', height: 'auto' }}
-                                                />
-                                            </div>
-                                        ) : (
-                                            <div className="gmail-setup-guide">
-                                                <div className="setup-part">
-                                                    <h4>PART 1 — Enable Forwarding</h4>
-                                                    <ol>
-                                                        <li>Open <strong>Gmail settings</strong> (gear icon) &gt; <strong>See all settings</strong>.</li>
-                                                        <li>Go to the <strong>Forwarding and POP/IMAP</strong> tab.</li>
-                                                        <li>Click <strong>Add a forwarding address</strong>.</li>
-                                                        <li>
-                                                            Enter your alias:
-                                                            <div className="copy-code-wrapper" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginLeft: '8px' }}>
-                                                                <code className="highlight-code" style={{ margin: 0 }}>{alias}@trackyjobby.com</code>
-                                                                <button
-                                                                    className="copy-icon-btn"
-                                                                    onClick={() => handleCopy(`${alias}@trackyjobby.com`)}
-                                                                    title="Copy to clipboard"
-                                                                    style={{
-                                                                        background: 'none',
-                                                                        border: 'none',
-                                                                        color: 'var(--text-secondary)',
-                                                                        cursor: 'pointer',
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        padding: '4px',
-                                                                        borderRadius: '4px',
-                                                                        transition: 'all 0.2s'
-                                                                    }}
-                                                                >
-                                                                    {copied ? <Check size={14} className="text-success" /> : <Copy size={14} />}
-                                                                </button>
-                                                            </div>
-                                                        </li>
-                                                        <li>Click <strong>Next</strong> &gt; <strong>Proceed</strong>. Gmail will send a confirmation link to us.</li>
-                                                    </ol>
-                                                    <div className="warning-note" style={{ fontSize: '0.8rem', color: '#ffab00', marginTop: '1rem', display: 'flex', gap: '8px', padding: '10px', background: 'rgba(255,171,0,0.05)', borderRadius: '6px' }}>
-                                                        <Mail size={14} style={{ flexShrink: 0 }} />
-                                                        <span>After clicking the link we receive, stay on this page. We will then set up a filter to only forward job emails.</span>
-                                                    </div>
+                                        <div className="tutorial-visual" style={{ marginBottom: '1.5rem', borderRadius: '12px', overflow: 'hidden', background: '#000', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                            <img
+                                                src="https://storage.googleapis.com/support-kms-prod/Cm6cYtX7pQvTaMzx3ADskquczoegpK3vShee"
+                                                alt="Gmail Forwarding Tutorial"
+                                                style={{ width: '100%', display: 'block', height: 'auto' }}
+                                            />
+                                        </div>
+
+                                        <p style={{ fontSize: '0.875rem', color: 'var(--text-primary)', fontWeight: 600, marginBottom: '0.75rem' }}>Follow these steps:</p>
+                                        <ol>
+                                            <li>Open <strong>Gmail settings</strong> (gear icon) &gt; <strong>See all settings</strong>.</li>
+                                            <li>Go to the <strong>Forwarding and POP/IMAP</strong> tab.</li>
+                                            <li>Click <strong>Add a forwarding address</strong>.</li>
+                                            <li>
+                                                Enter your alias:
+                                                <div className="copy-code-wrapper" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginLeft: '8px' }}>
+                                                    <code className="highlight-code" style={{ margin: 0 }}>{alias}@trackyjobby.com</code>
+                                                    <button
+                                                        className="copy-icon-btn"
+                                                        onClick={() => handleCopy(`${ alias } @trackyjobby.com`)}
+                                                        title="Copy to clipboard"
+                                                        style={{
+                                                            background: 'none',
+                                                            border: 'none',
+                                                            color: 'var(--text-secondary)',
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            padding: '4px',
+                                                            borderRadius: '4px',
+                                                            transition: 'all 0.2s'
+                                                        }}
+                                                    >
+                                                        {copied ? <Check size={14} className="text-success" /> : <Copy size={14} />}
+                                                    </button>
                                                 </div>
-                                            </div>
-                                        )}
+                                            </li>
+                                            <li>Click <strong>Next</strong> &gt; <strong>Proceed</strong>. Gmail will send a confirmation link to us.</li>
+                                        </ol>
+                                        <div className="warning-note" style={{ fontSize: '0.8rem', color: '#ffab00', marginTop: '1rem', display: 'flex', gap: '8px', padding: '10px', background: 'rgba(255,171,0,0.05)', borderRadius: '6px' }}>
+                                            <Mail size={14} style={{ flexShrink: 0 }} />
+                                            <span>After clicking the link we receive, stay on this page. We will then set up a filter to only forward job emails.</span>
+                                        </div>
                                     </div>
-                                </>
+                                </div>
                             ) : (
                                 <p>
                                     Set up a forwarding rule in your email client to forward all job-related emails to:
@@ -279,7 +229,7 @@ export default function EmailClientSetupPage() {
                                         <code className="highlight-code" style={{ margin: 0 }}>{alias}@trackyjobby.com</code>
                                         <button
                                             className="copy-icon-btn"
-                                            onClick={() => handleCopy(`${alias}@trackyjobby.com`)}
+                                            onClick={() => handleCopy(`${ alias } @trackyjobby.com`)}
                                             style={{
                                                 background: 'none',
                                                 border: 'none',
