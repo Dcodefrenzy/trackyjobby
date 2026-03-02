@@ -19,6 +19,7 @@ export default function ProfilePage() {
         recruiter: true,
         application: true
     });
+    const [customKeywords, setCustomKeywords] = useState('');
 
     const getFilterString = () => {
         const terms = [];
@@ -28,6 +29,12 @@ export default function ProfilePage() {
         if (filterOptions.offer) terms.push('subject:offer');
         if (filterOptions.recruiter) terms.push('recruiter', 'hiring');
         if (filterOptions.application) terms.push('"job application"', '"career opportunity"');
+
+        if (customKeywords.trim()) {
+            const keywords = customKeywords.split(',').map(k => k.trim()).filter(k => k);
+            terms.push(...keywords);
+        }
+
         return terms.length > 0 ? `(${terms.join(' OR ')})` : '';
     };
 
@@ -287,7 +294,7 @@ export default function ProfilePage() {
                                                 Select what kinds of emails you want to forward to TrackyJobby:
                                             </p>
 
-                                            <div className="filter-options" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '1rem', background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', textAlign: 'left' }}>
+                                            <div className="filter-options" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px', background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', textAlign: 'left' }}>
                                                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', cursor: 'pointer' }}>
                                                     <input type="checkbox" checked={filterOptions.job} onChange={e => setFilterOptions({ ...filterOptions, job: e.target.checked })} /> Job
                                                 </label>
@@ -306,6 +313,23 @@ export default function ProfilePage() {
                                                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', cursor: 'pointer' }}>
                                                     <input type="checkbox" checked={filterOptions.application} onChange={e => setFilterOptions({ ...filterOptions, application: e.target.checked })} /> Application terms
                                                 </label>
+                                            </div>
+                                            <div style={{ marginBottom: '1rem', textAlign: 'left' }}>
+                                                <input
+                                                    type="text"
+                                                    value={customKeywords}
+                                                    onChange={(e) => setCustomKeywords(e.target.value)}
+                                                    placeholder="Add custom keywords (comma separated)"
+                                                    style={{
+                                                        width: '100%',
+                                                        padding: '8px 12px',
+                                                        background: 'rgba(255,255,255,0.05)',
+                                                        border: '1px solid rgba(255,255,255,0.1)',
+                                                        borderRadius: '6px',
+                                                        color: 'var(--text-primary)',
+                                                        fontSize: '0.875rem'
+                                                    }}
+                                                />
                                             </div>
 
                                             <ol style={{ paddingLeft: '1.25rem' }}>
