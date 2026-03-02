@@ -9,7 +9,7 @@ git pull origin main
 
 # Build and start the Docker containers
 echo "🐳 Building and starting Docker containers in detached mode..."
-docker-compose up --build -d
+docker compose up --build -d
 
 echo ""
 echo "✅ Deployment successful! Containers are running:"
