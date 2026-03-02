@@ -1,4 +1,3 @@
-```
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, CheckCircle, ArrowRight, RefreshCcw, Send, Copy, Check } from 'lucide-react';
@@ -146,7 +145,7 @@ export default function EmailClientSetupPage() {
                             {['Gmail', 'Outlook', 'Apple Mail', 'Other'].map(c => (
                                 <button
                                     key={c}
-                                    className={`client - btn ${ client === c.toLowerCase() ? 'active' : '' } `}
+                                    className={`client-btn ${client === c.toLowerCase() ? 'active' : ''}`}
                                     onClick={() => setClient(c.toLowerCase())}
                                 >
                                     {c}
@@ -195,7 +194,7 @@ export default function EmailClientSetupPage() {
                                                     <code className="highlight-code" style={{ margin: 0 }}>{alias}@trackyjobby.com</code>
                                                     <button
                                                         className="copy-icon-btn"
-                                                        onClick={() => handleCopy(`${ alias } @trackyjobby.com`)}
+                                                        onClick={() => handleCopy(`${alias}@trackyjobby.com`)}
                                                         title="Copy to clipboard"
                                                         style={{
                                                             background: 'none',
@@ -229,7 +228,7 @@ export default function EmailClientSetupPage() {
                                         <code className="highlight-code" style={{ margin: 0 }}>{alias}@trackyjobby.com</code>
                                         <button
                                             className="copy-icon-btn"
-                                            onClick={() => handleCopy(`${ alias } @trackyjobby.com`)}
+                                            onClick={() => handleCopy(`${alias}@trackyjobby.com`)}
                                             style={{
                                                 background: 'none',
                                                 border: 'none',
