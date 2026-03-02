@@ -250,6 +250,16 @@ export default function ProfilePage() {
                                                 style={{ width: '100%', display: 'block', height: 'auto' }}
                                             />
                                         </div>
+
+                                        <div className="safe-forwarding-notice" style={{ background: 'rgba(56, 189, 248, 0.05)', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '12px', borderRadius: '8px', marginBottom: '1rem' }}>
+                                            <p style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, color: 'var(--info-color)', marginBottom: '4px', fontSize: '0.85rem' }}>
+                                                <ShieldCheck size={16} /> Privacy First: Action Required
+                                            </p>
+                                            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5', margin: 0 }}>
+                                                Adding an alias <strong>does not</strong> start forwarding. Gmail disables global forwarding by default. After verifying, you will create a filter to selectively forward only job emails.
+                                            </p>
+                                        </div>
+
                                         <p style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-primary)' }}>Set up forwarding:</p>
                                         <ol style={{ paddingLeft: '1.25rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
                                             <li>Open <strong>Gmail settings</strong> &gt; <strong>See all settings</strong>.</li>

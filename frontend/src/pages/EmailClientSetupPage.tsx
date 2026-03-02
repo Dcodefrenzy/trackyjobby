@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, CheckCircle, ArrowRight, RefreshCcw, Send, Copy, Check, Settings, MailWarning } from 'lucide-react';
+import { Mail, CheckCircle, ArrowRight, RefreshCcw, Send, Copy, Check, Settings, MailWarning, ShieldCheck } from 'lucide-react';
 import { setupForwarder, getMe, getForwardingVerification } from '../api/client';
 import './EmailClientSetupPage.css';
 
@@ -201,6 +201,15 @@ export default function EmailClientSetupPage() {
                                                 alt="Gmail Forwarding Tutorial"
                                                 style={{ width: '100%', display: 'block', height: 'auto' }}
                                             />
+                                        </div>
+
+                                        <div className="safe-forwarding-notice" style={{ background: 'rgba(56, 189, 248, 0.05)', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '12px', borderRadius: '8px', marginBottom: '1.5rem' }}>
+                                            <p style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, color: 'var(--info-color)', marginBottom: '4px', fontSize: '0.9rem' }}>
+                                                <ShieldCheck size={16} /> Privacy First: Action Required
+                                            </p>
+                                            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                                                Don't worry! Adding this forwarding address <strong>does not</strong> automatically forward your emails. Gmail keeps forwarding <strong>disabled by default</strong> even after you verify. In the next step, we will guide you to create a specific filter so <em>only</em> job-related emails are sent to us.
+                                            </p>
                                         </div>
 
                                         <p style={{ fontSize: '0.875rem', color: 'var(--text-primary)', fontWeight: 600, marginBottom: '0.75rem' }}>Follow these steps:</p>
