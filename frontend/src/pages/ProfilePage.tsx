@@ -11,6 +11,25 @@ export default function ProfilePage() {
     const [isPortalLoading, setIsPortalLoading] = useState(false);
     const [verificationUrl, setVerificationUrl] = useState<string | null>(null);
 
+    const [filterOptions, setFilterOptions] = useState({
+        job: true,
+        career: true,
+        interview: true,
+        offer: true,
+        recruiter: true,
+        application: true
+    });
+
+    const getFilterString = () => {
+        const terms = [];
+        if (filterOptions.job) terms.push('subject:job');
+        if (filterOptions.career) terms.push('subject:career');
+        if (filterOptions.interview) terms.push('subject:interview');
+        if (filterOptions.offer) terms.push('subject:offer');
+        if (filterOptions.recruiter) terms.push('recruiter', 'hiring');
+        if (filterOptions.application) terms.push('"job application"', '"career opportunity"');
+        return terms.length > 0 ? `(${terms.join(' OR ')})` : '';
+    };
 
     // Poll for Gmail verification link if instructions are open
     useEffect(() => {
@@ -248,20 +267,48 @@ export default function ProfilePage() {
                                     {verificationUrl && (
                                         <div className="setup-part" style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1rem', marginTop: '1rem' }}>
                                             <p style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                PART 2 — Create the Job Filter
-                                                <span style={{ fontSize: '0.6rem', background: 'rgba(255,255,255,0.1)', padding: '2px 4px', borderRadius: '4px' }}>OPTIONAL</span>
+                                                PART 2 — Create Job Filter (Required)
                                             </p>
+                                            <div className="warning-note" style={{ fontSize: '0.8rem', color: '#ffab00', marginBottom: '1rem', display: 'flex', gap: '8px', padding: '10px', background: 'rgba(255,171,0,0.05)', borderRadius: '6px' }}>
+                                                <MailWarning size={14} style={{ flexShrink: 0, marginTop: '2px' }} />
+                                                <span><strong>Important:</strong> Global forwarding is disabled by default in Gmail even after confirming. You MUST set up a filter to actually forward your job emails!</span>
+                                            </div>
+                                            <p style={{ fontSize: '0.875rem', marginBottom: '0.75rem', opacity: 0.8 }}>
+                                                Select what kinds of emails you want to forward to TrackyJobby:
+                                            </p>
+
+                                            <div className="filter-options" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '1rem', background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', textAlign: 'left' }}>
+                                                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', cursor: 'pointer' }}>
+                                                    <input type="checkbox" checked={filterOptions.job} onChange={e => setFilterOptions({ ...filterOptions, job: e.target.checked })} /> Job
+                                                </label>
+                                                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', cursor: 'pointer' }}>
+                                                    <input type="checkbox" checked={filterOptions.career} onChange={e => setFilterOptions({ ...filterOptions, career: e.target.checked })} /> Career
+                                                </label>
+                                                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', cursor: 'pointer' }}>
+                                                    <input type="checkbox" checked={filterOptions.interview} onChange={e => setFilterOptions({ ...filterOptions, interview: e.target.checked })} /> Interview
+                                                </label>
+                                                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', cursor: 'pointer' }}>
+                                                    <input type="checkbox" checked={filterOptions.offer} onChange={e => setFilterOptions({ ...filterOptions, offer: e.target.checked })} /> Offer
+                                                </label>
+                                                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', cursor: 'pointer' }}>
+                                                    <input type="checkbox" checked={filterOptions.recruiter} onChange={e => setFilterOptions({ ...filterOptions, recruiter: e.target.checked })} /> Recruiter / Hiring
+                                                </label>
+                                                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', cursor: 'pointer' }}>
+                                                    <input type="checkbox" checked={filterOptions.application} onChange={e => setFilterOptions({ ...filterOptions, application: e.target.checked })} /> Application terms
+                                                </label>
+                                            </div>
+
                                             <ol style={{ paddingLeft: '1.25rem' }}>
                                                 <li>In Gmail, click the search bar filter icon.</li>
                                                 <li>
                                                     Paste this in <strong>"Has the words"</strong>:
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', background: 'rgba(255,255,255,0.05)', padding: '4px 8px', borderRadius: '4px' }}>
                                                         <code style={{ fontSize: '0.7rem', color: 'var(--primary-color)', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                                            (subject:job OR subject:career OR subject:position OR subject:interview OR subject:offer OR recruiter OR hiring OR "job application" OR "career opportunity")
+                                                            {getFilterString()}
                                                         </code>
                                                         <button
                                                             onClick={() => {
-                                                                navigator.clipboard.writeText('(subject:job OR subject:career OR subject:position OR subject:interview OR subject:offer OR recruiter OR hiring OR "job application" OR "career opportunity")');
+                                                                navigator.clipboard.writeText(getFilterString());
                                                                 alert('Filter copied!');
                                                             }}
                                                             style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
@@ -271,6 +318,7 @@ export default function ProfilePage() {
                                                     </div>
                                                 </li>
                                                 <li>Click <strong>Create filter</strong> &gt; <strong>Forward it to</strong> &gt; select alias.</li>
+                                                <li>Click <strong>Create filter</strong>.</li>
                                             </ol>
                                         </div>
                                     )}

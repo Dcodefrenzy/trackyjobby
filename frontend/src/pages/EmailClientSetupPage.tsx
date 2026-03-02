@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, CheckCircle, ArrowRight, RefreshCcw, Send, Copy, Check, Settings } from 'lucide-react';
+import { Mail, CheckCircle, ArrowRight, RefreshCcw, Send, Copy, Check, Settings, MailWarning } from 'lucide-react';
 import { setupForwarder, getMe, getForwardingVerification } from '../api/client';
 import './EmailClientSetupPage.css';
 
@@ -16,6 +16,26 @@ export default function EmailClientSetupPage() {
     const [mockVerifyLink, setMockVerifyLink] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
     const [isCheckingUser, setIsCheckingUser] = useState(true);
+
+    const [filterOptions, setFilterOptions] = useState({
+        job: true,
+        career: true,
+        interview: true,
+        offer: true,
+        recruiter: true,
+        application: true
+    });
+
+    const getFilterString = () => {
+        const terms = [];
+        if (filterOptions.job) terms.push('subject:job');
+        if (filterOptions.career) terms.push('subject:career');
+        if (filterOptions.interview) terms.push('subject:interview');
+        if (filterOptions.offer) terms.push('subject:offer');
+        if (filterOptions.recruiter) terms.push('recruiter', 'hiring');
+        if (filterOptions.application) terms.push('"job application"', '"career opportunity"');
+        return terms.length > 0 ? `(${terms.join(' OR ')})` : '';
+    };
 
     useEffect(() => {
         getMe()
@@ -369,24 +389,49 @@ export default function EmailClientSetupPage() {
 
                             <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.5rem', marginTop: '1.5rem' }}>
                                 <p style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.75rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    2. Create Job Filter (Optional but Recommended)
-                                    <span style={{ fontSize: '0.7rem', background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '4px', fontWeight: 400 }}>OPTIONAL</span>
+                                    2. Create Job Filter (Required)
                                 </p>
+                                <div className="warning-note" style={{ fontSize: '0.8rem', color: '#ffab00', marginBottom: '1rem', display: 'flex', gap: '8px', padding: '10px', background: 'rgba(255,171,0,0.05)', borderRadius: '6px' }}>
+                                    <MailWarning size={14} style={{ flexShrink: 0, marginTop: '2px' }} />
+                                    <span><strong>Important:</strong> Global forwarding is disabled by default in Gmail even after confirming. You MUST set up a filter to actually forward your job emails!</span>
+                                </div>
                                 <p style={{ fontSize: '0.875rem', marginBottom: '0.75rem', opacity: 0.8 }}>
-                                    If you don't want to forward *every* email to TrackyJobby, create a search filter:
+                                    Select what kinds of emails you want to forward to TrackyJobby:
                                 </p>
-                                <ol style={{ paddingLeft: '1.25rem', fontSize: '0.875rem', lineHeight: '1.6' }}>
+
+                                <div className="filter-options" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '1rem', background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', textAlign: 'left' }}>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', cursor: 'pointer' }}>
+                                        <input type="checkbox" checked={filterOptions.job} onChange={e => setFilterOptions({ ...filterOptions, job: e.target.checked })} /> Job
+                                    </label>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', cursor: 'pointer' }}>
+                                        <input type="checkbox" checked={filterOptions.career} onChange={e => setFilterOptions({ ...filterOptions, career: e.target.checked })} /> Career
+                                    </label>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', cursor: 'pointer' }}>
+                                        <input type="checkbox" checked={filterOptions.interview} onChange={e => setFilterOptions({ ...filterOptions, interview: e.target.checked })} /> Interview
+                                    </label>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', cursor: 'pointer' }}>
+                                        <input type="checkbox" checked={filterOptions.offer} onChange={e => setFilterOptions({ ...filterOptions, offer: e.target.checked })} /> Offer
+                                    </label>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', cursor: 'pointer' }}>
+                                        <input type="checkbox" checked={filterOptions.recruiter} onChange={e => setFilterOptions({ ...filterOptions, recruiter: e.target.checked })} /> Recruiter / Hiring
+                                    </label>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', cursor: 'pointer' }}>
+                                        <input type="checkbox" checked={filterOptions.application} onChange={e => setFilterOptions({ ...filterOptions, application: e.target.checked })} /> Application terms
+                                    </label>
+                                </div>
+
+                                <ol style={{ paddingLeft: '1.25rem', fontSize: '0.875rem', lineHeight: '1.6', textAlign: 'left' }}>
                                     <li>In Gmail, click the <strong>Filter icon</strong> in the search bar.</li>
                                     <li>
                                         Paste this in <strong>"Has the words"</strong>:
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px', background: 'rgba(255,255,255,0.05)', padding: '8px', borderRadius: '4px' }}>
                                             <code style={{ fontSize: '0.75rem', color: 'var(--primary-color)', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                                (subject:job OR subject:career OR subject:position OR subject:interview OR subject:offer OR recruiter OR hiring OR "job application" OR "career opportunity")
+                                                {getFilterString()}
                                             </code>
                                             <button
                                                 className="copy-icon-btn"
-                                                onClick={() => handleCopy('(subject:job OR subject:career OR subject:position OR subject:interview OR subject:offer OR recruiter OR hiring OR "job application" OR "career opportunity")')}
-                                                style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
+                                                onClick={() => handleCopy(getFilterString())}
+                                                style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: '4px' }}
                                             >
                                                 {copied ? <Check size={14} className="text-success" /> : <Copy size={14} />}
                                             </button>
