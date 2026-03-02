@@ -15,12 +15,12 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
 export const STRIPE_PLANS = {
     MONTHLY: {
         id: 'monthly',
-        priceId: 'price_1T5xbaH3D385y2YkwfseNWJ6', // USER: Replace with actual Stripe Price ID
+        priceId: 'price_1T6Yr7H5khr25gCNFnDtqJkZ', // USER: Replace with actual Stripe Price ID
         amount: 200, // €2.00
     },
     YEARLY: {
         id: 'yearly',
-        priceId: 'price_1T5xbaH3D385y2YkfTpognCB', // USER: Replace with actual Stripe Price ID
+        priceId: 'price_1T6Yr7H5khr25gCNsd5QBbOk', // USER: Replace with actual Stripe Price ID
         amount: 1500, // €15.00
     }
 };
