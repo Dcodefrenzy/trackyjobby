@@ -49,9 +49,10 @@ export default function ProfilePage() {
             setIsPortalLoading(true);
             const { url } = await createPortalSession();
             window.open(url, '_blank');
-        } catch (err) {
-            console.error("Failed to open portal:", err);
-            alert("Could not open billing portal. Please try again later.");
+        } catch (err: any) {
+            console.error("Failed to open portal:", err.response?.data || err);
+            const errorMsg = err.response?.data?.error || "Please try again later.";
+            alert(`Could not open billing portal: ${errorMsg}`);
         } finally {
             setIsPortalLoading(false);
         }

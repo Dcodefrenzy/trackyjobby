@@ -62,15 +62,14 @@ export async function createCheckoutSession(userId: string, userEmail: string, p
 }
 
 export async function createPortalSession(customerId: string) {
+    const baseUrl = process.env.APP_URL || 'https://trackyjobby.com';
     const portalOptions: Stripe.BillingPortal.SessionCreateParams = {
         customer: customerId,
-        return_url: `${process.env.APP_URL || 'http://localhost:5174'}/dashboard?portal=return`,
+        return_url: `${baseUrl}/dashboard?portal=return`,
     };
 
-    const portalConfigId = process.env.STRIPE_PORTAL_CONFIG_ID || 'bpc_1T6ZCZH5khr25gCNYiTxTvLW';
-
-    if (portalConfigId) {
-        portalOptions.configuration = portalConfigId;
+    if (process.env.STRIPE_PORTAL_CONFIG_ID) {
+        portalOptions.configuration = process.env.STRIPE_PORTAL_CONFIG_ID;
     }
 
     const session = await stripe.billingPortal.sessions.create(portalOptions);
