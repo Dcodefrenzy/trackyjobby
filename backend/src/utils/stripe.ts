@@ -12,6 +12,17 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
     apiVersion: '2023-10-16' as any,
 });
 
+function getBaseUrl() {
+    let url = process.env.APP_URL || 'https://trackyjobby.com';
+    // Remove trailing slash if present
+    if (url.endsWith('/')) url = url.slice(0, -1);
+    // Add protocol if missing
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = 'https://' + url;
+    }
+    return url;
+}
+
 export const STRIPE_PLANS = {
     MONTHLY: {
         id: 'monthly',
@@ -27,7 +38,7 @@ export const STRIPE_PLANS = {
 
 export async function createCheckoutSession(userId: string, userEmail: string, planId: string) {
     const plan = Object.values(STRIPE_PLANS).find(p => p.id === planId);
-    const baseUrl = process.env.APP_URL || 'https://trackyjobby.com';
+    const baseUrl = getBaseUrl();
 
     if (!plan) {
         throw new Error(`Invalid plan ID: ${planId}`);
@@ -70,7 +81,7 @@ export async function createCheckoutSession(userId: string, userEmail: string, p
 }
 
 export async function createPortalSession(customerId: string) {
-    const baseUrl = process.env.APP_URL || 'https://trackyjobby.com';
+    const baseUrl = getBaseUrl();
     const portalOptions: Stripe.BillingPortal.SessionCreateParams = {
         customer: customerId,
         return_url: `${baseUrl}/dashboard?portal=return`,
