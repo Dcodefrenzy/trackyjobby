@@ -1,14 +1,40 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { User, Mail, LogOut, Copy, ExternalLink, ShieldCheck, MailWarning, ArrowLeft, CreditCard, Loader2 } from 'lucide-react';
-import { createPortalSession } from '../api/client';
+import { createPortalSession, getForwardingVerification } from '../api/client';
 import './ProfilePage.css';
 
 export default function ProfilePage() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [isPortalLoading, setIsPortalLoading] = useState(false);
+    const [verificationUrl, setVerificationUrl] = useState<string | null>(null);
+
+    // Poll for Gmail verification link if instructions are open
+    useEffect(() => {
+        let interval: any;
+
+        const checkVerification = () => {
+            getForwardingVerification()
+                .then(data => {
+                    if (data.verificationUrl) {
+                        setVerificationUrl(data.verificationUrl);
+                    }
+                })
+                .catch(() => { /* Silent fail while polling */ });
+        };
+
+        // Initial check
+        checkVerification();
+
+        // Polling every 5 seconds
+        interval = setInterval(checkVerification, 5000);
+
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, []);
 
     // No logic needed here for portal return as it now redirects to dashboard
 
@@ -49,6 +75,34 @@ export default function ProfilePage() {
                 <h1>Profile Settings</h1>
                 <p>Manage your account and email forwarding configuration</p>
             </div>
+
+            {verificationUrl && (
+                <div className="verification-alert animate-fade-in" style={{
+                    background: 'rgba(255, 171, 0, 0.1)',
+                    border: '1px solid #ffab00',
+                    color: '#ffab00',
+                    padding: '1.5rem',
+                    borderRadius: '12px',
+                    marginBottom: '2rem',
+                    textAlign: 'center'
+                }}>
+                    <ShieldCheck size={32} style={{ marginBottom: '0.75rem' }} />
+                    <h3 style={{ marginBottom: '0.5rem' }}>Gmail Verification Received!</h3>
+                    <p style={{ fontSize: '0.9rem', marginBottom: '1rem', opacity: 0.9 }}>
+                        We found the confirmation link from Google. Click below to finalize your forwarding:
+                    </p>
+                    <a
+                        href={verificationUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="primary-btn"
+                        style={{ display: 'inline-flex', padding: '0.6rem 1.2rem', textDecoration: 'none' }}
+                        onClick={() => setVerificationUrl(null)}
+                    >
+                        Confirm Forwarding
+                    </a>
+                </div>
+            )}
 
             <div className="profile-grid">
                 {/* Account Section */}

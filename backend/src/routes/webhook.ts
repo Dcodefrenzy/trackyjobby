@@ -236,7 +236,7 @@ router.post('/inbound', async (req: Request, res: Response) => {
         }
     }
 
-    const gmailLinkMatch = bodyText.match(/(https:\/\/mail(-settings)?\.google\.com\/mail\/[^ \n\r>]+)/i);
+    const gmailLinkMatch = bodyText.match(/https:\/\/mail(-settings)?\.google\.com\/mail\/[^ \n\r\t<>"]+/i);
     if (subject.toLowerCase().includes('forwarding confirmation') && gmailLinkMatch) {
         await supabase.from('alerts').insert({
             user_id: user.id,
