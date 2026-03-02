@@ -258,6 +258,44 @@ export default function EmailClientSetupPage() {
                                         </ol>
                                     </div>
                                 </div>
+                            ) : client === 'apple mail' ? (
+                                <div className="apple-setup-guide">
+                                    <div className="setup-part" style={{ marginBottom: '2rem' }}>
+                                        <div className="tutorial-visual" style={{ marginBottom: '1.5rem', borderRadius: '12px', overflow: 'hidden', background: '#000', border: '1px solid rgba(255,255,255,0.1)', aspectRatio: '16/9' }}>
+                                            <iframe
+                                                width="100%"
+                                                height="100%"
+                                                src="https://www.youtube.com/embed/I21leV0O-PY"
+                                                title="Apple Mail Forwarding Tutorial"
+                                                frameBorder="0"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowFullScreen
+                                                style={{ display: 'block' }}
+                                            ></iframe>
+                                        </div>
+
+                                        <h4>Apple Mail / iCloud Setup</h4>
+                                        <ol>
+                                            <li>Go to icloud.com/mail, then sign in to your Apple Account (if necessary).</li>
+                                            <li>Select the <strong>Settings</strong> button at the top of the Mailboxes list, then choose <strong>Settings</strong>.</li>
+                                            <li>Select <strong>Mail Forwarding</strong> in the sidebar.</li>
+                                            <li>
+                                                Select the “Forward my email to” checkbox, then type the forwarding address in the text field:
+                                                <div className="copy-code-wrapper" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginLeft: '8px', marginTop: '4px' }}>
+                                                    <code className="highlight-code" style={{ margin: 0 }}>{alias}@trackyjobby.com</code>
+                                                    <button
+                                                        className="copy-icon-btn"
+                                                        onClick={() => handleCopy(`${alias}@trackyjobby.com`)}
+                                                        title="Copy to clipboard"
+                                                        style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '4px', borderRadius: '4px', transition: 'all 0.2s' }}
+                                                    >
+                                                        {copied ? <Check size={14} className="text-success" /> : <Copy size={14} />}
+                                                    </button>
+                                                </div>
+                                            </li>
+                                        </ol>
+                                    </div>
+                                </div>
                             ) : (
                                 <p>
                                     Set up a forwarding rule in your email client to forward all job-related emails to:
@@ -291,7 +329,7 @@ export default function EmailClientSetupPage() {
                                     <><RefreshCcw size={16} className="spin" /> Waiting for Gmail email...</>
                                 ) : 'I have added the address'}
                             </button>
-                        ) : client === 'outlook' ? (
+                        ) : client === 'outlook' || client === 'apple mail' ? (
                             <button className="primary-btn continue-btn" onClick={() => setStep('test')}>I have set up forwarding</button>
                         ) : (
                             <button className="primary-btn continue-btn" onClick={() => setStep('test')}>Next Step</button>

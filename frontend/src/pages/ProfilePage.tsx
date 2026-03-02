@@ -320,11 +320,31 @@ export default function ProfilePage() {
                                 <ExternalLink size={14} className="ml-auto" />
                             </summary>
                             <div className="step-content">
-                                <ol>
-                                    <li>Log in to <strong>iCloud.com</strong> and open <strong>Mail</strong>.</li>
-                                    <li>Click the <strong>Gear icon</strong> &gt; <strong>Preferences</strong> &gt; <strong>Forwarding</strong>.</li>
-                                    <li>Check <strong>Forward my email to</strong> and enter your alias.</li>
-                                </ol>
+                                <div className="apple-setup-guide" style={{ fontSize: '0.875rem' }}>
+                                    <div className="setup-part" style={{ marginBottom: '1.5rem' }}>
+                                        <div className="tutorial-visual" style={{ marginBottom: '1rem', borderRadius: '8px', overflow: 'hidden', background: '#000', border: '1px solid rgba(255,255,255,0.1)', aspectRatio: '16/9' }}>
+                                            <iframe
+                                                width="100%"
+                                                height="100%"
+                                                src="https://www.youtube.com/embed/I21leV0O-PY"
+                                                title="Apple Mail Forwarding Tutorial"
+                                                frameBorder="0"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowFullScreen
+                                                style={{ display: 'block' }}
+                                            ></iframe>
+                                        </div>
+                                        <ol style={{ paddingLeft: '1.25rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                                            <li>Go to icloud.com/mail, then sign in to your Apple Account (if necessary).</li>
+                                            <li>Select the <strong>Settings</strong> button at the top of the Mailboxes list, then choose <strong>Settings</strong>.</li>
+                                            <li>Select <strong>Mail Forwarding</strong> in the sidebar.</li>
+                                            <li>
+                                                Select the “Forward my email to” checkbox, then type the forwarding address in the text field:
+                                                <div style={{ marginTop: '4px' }}><code style={{ background: 'var(--card-bg)', border: '1px solid var(--border-color)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.8rem', color: 'var(--text-primary)' }}>{user.forwardingEmail}</code></div>
+                                            </li>
+                                        </ol>
+                                    </div>
+                                </div>
                             </div>
                         </details>
                     </div>
