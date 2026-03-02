@@ -223,8 +223,6 @@ export default function EmailClientSetupPage() {
                             ) : client === 'outlook' ? (
                                 <div className="outlook-setup-guide">
                                     <div className="setup-part" style={{ marginBottom: '2rem' }}>
-                                        <h4>New Outlook & Web Version Setup</h4>
-
                                         <div className="tutorial-visual" style={{ marginBottom: '1.5rem', borderRadius: '12px', overflow: 'hidden', background: '#000', border: '1px solid rgba(255,255,255,0.1)', aspectRatio: '16/9' }}>
                                             <iframe
                                                 width="100%"
@@ -238,6 +236,7 @@ export default function EmailClientSetupPage() {
                                             ></iframe>
                                         </div>
 
+                                        <h4>New Outlook & Web Version Setup</h4>
                                         <p style={{ fontSize: '0.875rem', color: 'var(--text-primary)', fontWeight: 600, marginBottom: '0.75rem' }}>Follow these steps:</p>
                                         <ol>
                                             <li>At the top window of the new Outlook, select the <strong>Settings</strong> gear icon.</li>
