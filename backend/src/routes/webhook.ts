@@ -90,7 +90,7 @@ router.post('/stripe', async (req: Request, res: Response) => {
             }
 
             case 'invoice.paid': {
-                const invoice = event.data.object as Stripe.Invoice;
+                const invoice = event.data.object as any;
                 const subscriptionId = invoice.subscription as string;
 
                 // Find user by stripe_subscription_id
@@ -116,7 +116,7 @@ router.post('/stripe', async (req: Request, res: Response) => {
             }
 
             case 'invoice.payment_failed': {
-                const invoice = event.data.object as Stripe.Invoice;
+                const invoice = event.data.object as any;
                 const subscriptionId = invoice.subscription as string;
 
                 const { data: user } = await supabase
