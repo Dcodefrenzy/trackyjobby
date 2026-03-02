@@ -261,19 +261,6 @@ export default function EmailClientSetupPage() {
                             ) : client === 'apple mail' ? (
                                 <div className="apple-setup-guide">
                                     <div className="setup-part" style={{ marginBottom: '2rem' }}>
-                                        <div className="tutorial-visual" style={{ marginBottom: '1.5rem', borderRadius: '12px', overflow: 'hidden', background: '#000', border: '1px solid rgba(255,255,255,0.1)', aspectRatio: '16/9' }}>
-                                            <iframe
-                                                width="100%"
-                                                height="100%"
-                                                src="https://www.youtube.com/embed/I21leV0O-PY"
-                                                title="Apple Mail Forwarding Tutorial"
-                                                frameBorder="0"
-                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                                allowFullScreen
-                                                style={{ display: 'block' }}
-                                            ></iframe>
-                                        </div>
-
                                         <h4>Apple Mail / iCloud Setup</h4>
                                         <ol>
                                             <li>Go to icloud.com/mail, then sign in to your Apple Account (if necessary).</li>
@@ -297,25 +284,32 @@ export default function EmailClientSetupPage() {
                                     </div>
                                 </div>
                             ) : (
-                                <p>
-                                    Set up a forwarding rule in your email client to forward all job-related emails to:
-                                    <br />
-                                    <div className="copy-code-wrapper" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
-                                        <code className="highlight-code" style={{ margin: 0 }}>{alias}@trackyjobby.com</code>
-                                        <button
-                                            className="copy-icon-btn"
-                                            onClick={() => handleCopy(`${alias}@trackyjobby.com`)}
-                                            style={{
-                                                background: 'none',
-                                                border: 'none',
-                                                color: 'var(--text-secondary)',
-                                                cursor: 'pointer'
-                                            }}
-                                        >
-                                            {copied ? <Check size={14} className="text-success" /> : <Copy size={14} />}
-                                        </button>
+                                <div className="other-setup-guide">
+                                    <div className="setup-part" style={{ marginBottom: '2rem' }}>
+                                        <h4>Generic Email Setup</h4>
+                                        <p style={{ fontSize: '0.875rem', color: 'var(--text-primary)', fontWeight: 600, marginBottom: '0.75rem' }}>Follow these general steps for your provider:</p>
+                                        <ol>
+                                            <li>Log in to your email provider.</li>
+                                            <li>Go to your account <strong>Settings</strong> or <strong>Preferences</strong>.</li>
+                                            <li>Look for a <strong>Forwarding</strong> or <strong>Filters</strong> section.</li>
+                                            <li>
+                                                Add your TrackyJobby alias as a forwarding address:
+                                                <div className="copy-code-wrapper" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginLeft: '8px', marginTop: '4px' }}>
+                                                    <code className="highlight-code" style={{ margin: 0 }}>{alias}@trackyjobby.com</code>
+                                                    <button
+                                                        className="copy-icon-btn"
+                                                        onClick={() => handleCopy(`${alias}@trackyjobby.com`)}
+                                                        title="Copy to clipboard"
+                                                        style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '4px', borderRadius: '4px', transition: 'all 0.2s' }}
+                                                    >
+                                                        {copied ? <Check size={14} className="text-success" /> : <Copy size={14} />}
+                                                    </button>
+                                                </div>
+                                            </li>
+                                            <li>Save your changes and confirm if required.</li>
+                                        </ol>
                                     </div>
-                                </p>
+                                </div>
                             )}
                         </div>
 
