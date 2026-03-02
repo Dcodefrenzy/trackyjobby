@@ -15,16 +15,16 @@ const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 
-// Special handled for Stripe Webhook to preserve raw body
+// --- WEBHOOKS (MUST go BEFORE express.json() to preserve raw body) ---
+// We handle Stripe with express.raw() to avoid signature verification failures.
 app.post('/api/webhook/stripe', express.raw({ type: 'application/json' }), webhookRoutes);
 
-// Shared JSON middleware for all other routes
+// Global JSON parsing for all other routes
 app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
-// app.use('/api/webhook', webhookRoutes); // Moved above for specific processing
-app.use('/api/webhook/inbound', webhookRoutes); // Handle Resend separately
+app.use('/api/webhook/inbound', webhookRoutes); // Resend still uses JSON
 app.use('/api/jobs', jobsRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/payment', paymentRoutes);

@@ -15,7 +15,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
  * 
  * Handles Stripe subscription and payment events
  */
-router.post('/stripe', async (req: Request, res: Response) => {
+router.post(['/', '/stripe'], async (req: Request, res: Response) => {
     console.log('🔔 [STRIPE] Webhook HIT - Method:', req.method, 'URL:', req.url);
     const sig = req.headers['stripe-signature'] as string;
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
@@ -226,7 +226,7 @@ router.post('/stripe', async (req: Request, res: Response) => {
  * 
  * Catch-all inbound endpoint for Resend emails
  */
-router.post('/inbound', async (req: Request, res: Response) => {
+router.post(['/', '/inbound'], async (req: Request, res: Response) => {
     const rawBody = (req as any).rawBody;
     const payloadString = rawBody ? rawBody.toString('utf8') : JSON.stringify(req.body);
 
