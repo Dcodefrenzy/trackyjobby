@@ -366,7 +366,7 @@ export default function DashboardPage() {
                         </div>
 
                         <div className="modal-footer">
-                            <button className="secondary-btn" onClick={() => setIsModalOpen(false)}>Close</button>
+                            <button className="secondary-btn" onClick={() => setIsModalOpen(false)}>Cancel</button>
                         </div>
                     </div>
                 </div>
