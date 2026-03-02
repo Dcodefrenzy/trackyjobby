@@ -52,7 +52,14 @@ export default function ProfilePage() {
         } catch (err: any) {
             console.error("Failed to open portal:", err.response?.data || err);
             const errorMsg = err.response?.data?.error || "Please try again later.";
-            alert(`Could not open billing portal: ${errorMsg}`);
+
+            if (errorMsg.includes("No active subscription")) {
+                if (window.confirm("You haven't started a subscription yet. Would you like to view our plans?")) {
+                    navigate('/plan-selection');
+                }
+            } else {
+                alert(`Could not open billing portal: ${errorMsg}`);
+            }
         } finally {
             setIsPortalLoading(false);
         }
