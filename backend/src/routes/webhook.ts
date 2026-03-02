@@ -142,30 +142,51 @@ router.post('/stripe', async (req: Request, res: Response) => {
 
             case 'checkout.session.completed': {
                 const session = event.data.object as Stripe.Checkout.Session;
-                if (session.mode === 'payment') {
-                    const userId = session.metadata?.userId;
-                    const planId = session.metadata?.planId;
+                const userId = session.metadata?.userId;
+                const planId = session.metadata?.planId;
 
-                    if (userId && planId === 'lifetime') {
-                        await supabase
-                            .from('users')
-                            .update({
-                                subscription_status: 'lifetime',
-                                stripe_customer_id: session.customer as string,
-                                plan_id: 'lifetime'
-                            })
-                            .eq('id', userId);
+                console.log(`✅ [STRIPE] Checkout session completed: ${session.id} (Mode: ${session.mode}, User: ${userId})`);
 
-                        await supabase.from('transactions').insert({
-                            user_id: userId,
-                            stripe_payment_intent_id: session.payment_intent as string,
-                            amount: session.amount_total || 0,
-                            currency: session.currency || 'eur',
-                            status: 'succeeded',
+                if (!userId) {
+                    console.error('❌ [STRIPE] No userId in session metadata');
+                    break;
+                }
+
+                if (session.mode === 'subscription') {
+                    // For subscriptions, we set them to 'trialing' immediately (since we offer a 3-day trial)
+                    const { error } = await supabase
+                        .from('users')
+                        .update({
+                            subscription_status: 'trialing',
+                            stripe_customer_id: session.customer as string,
+                            stripe_subscription_id: session.subscription as string,
+                            plan_id: planId
+                        })
+                        .eq('id', userId);
+
+                    if (error) console.error('❌ [STRIPE] Failed to sync subscription checkout:', error.message);
+                    else console.log(`✅ [STRIPE] Synced subscription checkout for user ${userId}`);
+                }
+                else if (session.mode === 'payment' && planId === 'lifetime') {
+                    // Existing lifetime logic
+                    await supabase
+                        .from('users')
+                        .update({
+                            subscription_status: 'lifetime',
+                            stripe_customer_id: session.customer as string,
                             plan_id: 'lifetime'
-                        });
-                        console.log(`✅ [STRIPE] Set lifetime access & recorded transaction for user ${userId}`);
-                    }
+                        })
+                        .eq('id', userId);
+
+                    await supabase.from('transactions').insert({
+                        user_id: userId,
+                        stripe_payment_intent_id: session.payment_intent as string,
+                        amount: session.amount_total || 0,
+                        currency: session.currency || 'eur',
+                        status: 'succeeded',
+                        plan_id: 'lifetime'
+                    });
+                    console.log(`✅ [STRIPE] Set lifetime access for user ${userId}`);
                 }
                 break;
             }
