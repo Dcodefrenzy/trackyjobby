@@ -196,19 +196,11 @@ export default function EmailClientSetupPage() {
                         <h2>Configure Forwarding</h2>
                         <p className="subtitle">Follow these instructions for {client === 'gmail' ? 'Gmail' : 'your client'}.</p>
 
-                        <div className="instructions-box" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                        <div className="instructions-box">
                             {client === 'gmail' ? (
                                 <div className="gmail-setup-guide">
                                     <div className="setup-part">
                                         <h4>Gmail Forwarding Setup</h4>
-
-                                        <div className="tutorial-visual" style={{ marginBottom: '1.5rem', borderRadius: '12px', overflow: 'hidden', background: '#000', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                            <img
-                                                src="https://storage.googleapis.com/support-kms-prod/Cm6cYtX7pQvTaMzx3ADskquczoegpK3vShee"
-                                                alt="Gmail Forwarding Tutorial"
-                                                style={{ width: '100%', display: 'block', height: 'auto' }}
-                                            />
-                                        </div>
 
                                         <div className="safe-forwarding-notice" style={{ background: 'rgba(56, 189, 248, 0.05)', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '12px', borderRadius: '8px', marginBottom: '1.5rem' }}>
                                             <p style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, color: 'var(--info-color)', marginBottom: '4px', fontSize: '0.9rem' }}>
@@ -217,6 +209,14 @@ export default function EmailClientSetupPage() {
                                             <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
                                                 Don't worry! Adding this forwarding address <strong>does not</strong> automatically forward your emails. Gmail keeps forwarding <strong>disabled by default</strong> even after you verify. In the next step, we will guide you to create a specific filter so <em>only</em> job-related emails are sent to us.
                                             </p>
+                                        </div>
+
+                                        <div className="tutorial-visual" style={{ marginBottom: '1.5rem', borderRadius: '12px', overflow: 'hidden', background: '#000', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                            <img
+                                                src="https://storage.googleapis.com/support-kms-prod/Cm6cYtX7pQvTaMzx3ADskquczoegpK3vShee"
+                                                alt="Gmail Forwarding Tutorial"
+                                                style={{ width: '100%', display: 'block', height: 'auto' }}
+                                            />
                                         </div>
 
                                         <p style={{ fontSize: '0.875rem', color: 'var(--text-primary)', fontWeight: 600, marginBottom: '0.75rem' }}>Follow these steps:</p>
@@ -259,6 +259,15 @@ export default function EmailClientSetupPage() {
                             ) : client === 'outlook' ? (
                                 <div className="outlook-setup-guide">
                                     <div className="setup-part" style={{ marginBottom: '2rem' }}>
+                                        <div className="safe-forwarding-notice" style={{ background: 'rgba(56, 189, 248, 0.05)', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '12px', borderRadius: '8px', marginBottom: '1.5rem' }}>
+                                            <p style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, color: 'var(--info-color)', marginBottom: '4px', fontSize: '0.9rem' }}>
+                                                <ShieldCheck size={16} /> Privacy First: Stay in Control
+                                            </p>
+                                            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                                                Don't want to forward all your emails? <strong>You don't have to!</strong> Instead of setting up global forwarding, you can use <strong>Outlook Rules</strong> to only forward emails that match job-related keywords (like "Job offer", "Interview", etc.) to your TrackyJobby alias.
+                                            </p>
+                                        </div>
+
                                         <div className="tutorial-visual" style={{ marginBottom: '1.5rem', borderRadius: '12px', overflow: 'hidden', background: '#000', border: '1px solid rgba(255,255,255,0.1)', aspectRatio: '16/9' }}>
                                             <iframe
                                                 width="100%"
@@ -270,15 +279,6 @@ export default function EmailClientSetupPage() {
                                                 allowFullScreen
                                                 style={{ display: 'block' }}
                                             ></iframe>
-                                        </div>
-
-                                        <div className="safe-forwarding-notice" style={{ background: 'rgba(56, 189, 248, 0.05)', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '12px', borderRadius: '8px', marginBottom: '1.5rem' }}>
-                                            <p style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, color: 'var(--info-color)', marginBottom: '4px', fontSize: '0.9rem' }}>
-                                                <ShieldCheck size={16} /> Privacy First: Stay in Control
-                                            </p>
-                                            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
-                                                Don't want to forward all your emails? <strong>You don't have to!</strong> Instead of setting up global forwarding, you can use <strong>Outlook Rules</strong> to only forward emails that match job-related keywords (like "Job offer", "Interview", etc.) to your TrackyJobby alias.
-                                            </p>
                                         </div>
 
                                         <h4>Microsoft Outlook Setup</h4>
@@ -333,6 +333,14 @@ export default function EmailClientSetupPage() {
                                 <div className="other-setup-guide">
                                     <div className="setup-part" style={{ marginBottom: '2rem' }}>
                                         <h4>Generic Email Setup</h4>
+                                        <div className="safe-forwarding-notice" style={{ background: 'rgba(56, 189, 248, 0.05)', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '12px', borderRadius: '8px', marginBottom: '1.5rem', marginTop: '1rem' }}>
+                                            <p style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, color: 'var(--info-color)', marginBottom: '4px', fontSize: '0.9rem' }}>
+                                                <ShieldCheck size={16} /> Privacy First: Use Filters
+                                            </p>
+                                            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                                                To protect your privacy, we recommend setting up an <strong>Email Filter or Rule</strong> in your provider's settings. Tell your provider to only forward emails that contain job-related keywords (like "Offer", "Interview", "Application") instead of forwarding your entire inbox.
+                                            </p>
+                                        </div>
                                         <p style={{ fontSize: '0.875rem', color: 'var(--text-primary)', fontWeight: 600, marginBottom: '0.75rem' }}>Follow these general steps for your provider:</p>
                                         <ol>
                                             <li>Log in to your email provider.</li>

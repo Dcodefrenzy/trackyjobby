@@ -435,6 +435,14 @@ export default function ProfilePage() {
                             <div className="step-content">
                                 <div className="other-setup-guide" style={{ fontSize: '0.875rem' }}>
                                     <div className="setup-part" style={{ marginBottom: '1.5rem' }}>
+                                        <div className="safe-forwarding-notice" style={{ background: 'rgba(56, 189, 248, 0.05)', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '12px', borderRadius: '8px', marginBottom: '1.5rem' }}>
+                                            <p style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, color: 'var(--info-color)', marginBottom: '4px', fontSize: '0.85rem' }}>
+                                                <ShieldCheck size={16} /> Privacy First: Use Filters
+                                            </p>
+                                            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5', margin: 0 }}>
+                                                To protect your privacy, we recommend setting up an <strong>Email Filter or Rule</strong> in your provider's settings. Tell your provider to only forward emails that contain job-related keywords (like "Offer", "Interview", "Application") instead of forwarding your entire inbox.
+                                            </p>
+                                        </div>
                                         <ol style={{ paddingLeft: '1.25rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
                                             <li>Log in to your email provider and navigate to <strong>Settings</strong> or <strong>Preferences</strong>.</li>
                                             <li>Look for a <strong>Forwarding</strong> or <strong>Filters</strong> section.</li>
