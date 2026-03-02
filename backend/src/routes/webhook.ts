@@ -16,12 +16,13 @@ const resend = new Resend(process.env.RESEND_API_KEY);
  * Handles Stripe subscription and payment events
  */
 router.post('/stripe', async (req: Request, res: Response) => {
+    console.log('🔔 [STRIPE] Webhook HIT - Method:', req.method, 'URL:', req.url);
     const sig = req.headers['stripe-signature'] as string;
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
     let event: Stripe.Event;
 
-    console.log(`🔍 [STRIPE] Secret: ${webhookSecret ? webhookSecret.substring(0, 8) + '...' : 'MISSING'}`);
-    console.log(`🔍 [STRIPE] Signature Header: ${sig ? sig.substring(0, 20) + '...' : 'MISSING'}`);
+    console.log(`🔍 [STRIPE] Secret (Suffix): ...${webhookSecret.slice(-4)}`);
+    console.log(`🔍 [STRIPE] Signature Header (Start): ${sig ? sig.substring(0, 20) + '...' : 'MISSING'}`);
     console.log(`🔍 [STRIPE] Raw Body Present: ${!!(req as any).rawBody}`);
 
     try {
@@ -158,7 +159,7 @@ router.post('/stripe', async (req: Request, res: Response) => {
 
             case 'checkout.session.completed': {
                 const session = event.data.object as Stripe.Checkout.Session;
-                const userId = session.metadata?.userId;
+                const userId = session.metadata?.userId || session.client_reference_id;
                 const planId = session.metadata?.planId;
 
                 console.log(`✅ [STRIPE] Checkout session completed: ${session.id} (Mode: ${session.mode}, User: ${userId})`);
