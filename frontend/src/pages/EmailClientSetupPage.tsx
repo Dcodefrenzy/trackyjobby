@@ -196,7 +196,7 @@ export default function EmailClientSetupPage() {
                         <h2>Configure Forwarding</h2>
                         <p className="subtitle">Follow these instructions for {client === 'gmail' ? 'Gmail' : 'your client'}.</p>
 
-                        <div className="instructions-box">
+                        <div className="instructions-box" style={{ maxHeight: '400px', overflowY: 'auto' }}>
                             {client === 'gmail' ? (
                                 <div className="gmail-setup-guide">
                                     <div className="setup-part">
