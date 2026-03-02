@@ -10,6 +10,7 @@ export default function ProfilePage() {
     const navigate = useNavigate();
     const [isPortalLoading, setIsPortalLoading] = useState(false);
     const [verificationUrl, setVerificationUrl] = useState<string | null>(null);
+    const [showVideo, setShowVideo] = useState(false);
 
     // Poll for Gmail verification link if instructions are open
     useEffect(() => {
@@ -213,44 +214,100 @@ export default function ProfilePage() {
                                 <ExternalLink size={14} className="ml-auto" />
                             </summary>
                             <div className="step-content">
+                                <div className="setup-tabs" style={{ display: 'flex', gap: '8px', marginBottom: '1rem' }}>
+                                    <button
+                                        className={`mini-tab ${!showVideo ? 'active' : ''}`}
+                                        onClick={() => setShowVideo(false)}
+                                        style={{
+                                            flex: 1,
+                                            padding: '6px',
+                                            borderRadius: '6px',
+                                            border: '1px solid rgba(255,255,255,0.1)',
+                                            background: !showVideo ? 'rgba(255,255,255,0.1)' : 'transparent',
+                                            color: !showVideo ? 'var(--primary-color)' : 'var(--text-secondary)',
+                                            fontSize: '0.75rem',
+                                            fontWeight: 600,
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        Written
+                                    </button>
+                                    <button
+                                        className={`mini-tab ${showVideo ? 'active' : ''}`}
+                                        onClick={() => setShowVideo(true)}
+                                        style={{
+                                            flex: 1,
+                                            padding: '6px',
+                                            borderRadius: '6px',
+                                            border: '1px solid rgba(255,255,255,0.1)',
+                                            background: showVideo ? 'rgba(255,255,255,0.1)' : 'transparent',
+                                            color: showVideo ? 'var(--primary-color)' : 'var(--text-secondary)',
+                                            fontSize: '0.75rem',
+                                            fontWeight: 600,
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        Video
+                                    </button>
+                                </div>
+
                                 <div className="gmail-setup-guide" style={{ fontSize: '0.875rem' }}>
-                                    <div className="setup-part">
-                                        <p style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-primary)' }}>PART 1 — Enable Forwarding</p>
-                                        <ol style={{ paddingLeft: '1.25rem', marginBottom: '1rem' }}>
-                                            <li>Open <strong>Gmail Settings</strong> &gt; <strong>Forwarding</strong>.</li>
-                                            <li>Click <strong>Add a forwarding address</strong>.</li>
-                                            <li>Paste your alias and verify the link above.</li>
-                                        </ol>
-                                        <p style={{ fontSize: '0.75rem', color: '#ffab00', marginBottom: '1rem' }}>
-                                            ⚠️ Do NOT choose "Forward a copy of all incoming mail".
-                                        </p>
-                                    </div>
-                                    <div className="setup-part" style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1rem' }}>
-                                        <p style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-primary)' }}>PART 2 — Create the Job Filter</p>
-                                        <ol style={{ paddingLeft: '1.25rem' }}>
-                                            <li>In Gmail, click the search bar filter icon.</li>
-                                            <li>
-                                                Paste this in <strong>"Has the words"</strong>:
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px', background: 'rgba(255,255,255,0.05)', padding: '4px 8px', borderRadius: '4px' }}>
-                                                    <code style={{ fontSize: '0.7rem', color: 'var(--primary-color)', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                                        (subject:job OR subject:career OR subject:position OR subject:interview OR subject:offer OR recruiter OR hiring OR "job application" OR "career opportunity")
-                                                    </code>
-                                                    <button
-                                                        onClick={() => {
-                                                            navigator.clipboard.writeText('(subject:job OR subject:career OR subject:position OR subject:interview OR subject:offer OR recruiter OR hiring OR "job application" OR "career opportunity")');
-                                                            alert('Filter copied!');
-                                                        }}
-                                                        style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
-                                                    >
-                                                        <Copy size={12} />
-                                                    </button>
-                                                </div>
-                                            </li>
-                                            <li>Click <strong>Create filter</strong>.</li>
-                                            <li>Check <strong>Forward it to</strong> and select your alias.</li>
-                                            <li>Click <strong>Create filter</strong>.</li>
-                                        </ol>
-                                    </div>
+                                    {showVideo ? (
+                                        <div className="video-wrapper" style={{ borderRadius: '8px', overflow: 'hidden', background: '#000', border: '1px solid rgba(255,255,255,0.1)', marginBottom: '1rem' }}>
+                                            <video
+                                                src="https://storage.googleapis.com/support-kms-prod/Cm6cYtX7pQvTaMzx3ADskquczoegpK3vShee"
+                                                controls
+                                                autoPlay
+                                                muted
+                                                loop
+                                                playsInline
+                                                style={{ width: '100%', display: 'block' }}
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="setup-part">
+                                            <p style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-primary)' }}>PART 1 — Enable Forwarding</p>
+                                            <ol style={{ paddingLeft: '1.25rem', marginBottom: '1rem' }}>
+                                                <li>Open <strong>Gmail Settings</strong> &gt; <strong>Forwarding</strong>.</li>
+                                                <li>Click <strong>Add a forwarding address</strong>.</li>
+                                                <li>Paste your alias: <code>{user.forwardingEmail}</code></li>
+                                            </ol>
+                                            <div style={{ background: 'rgba(255,171,0,0.05)', padding: '10px', borderRadius: '6px', fontSize: '0.75rem', color: '#ffab00' }}>
+                                                <MailWarning size={14} style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+                                                <span>After adding the address, stay on this page. The verification link will appear at the top.</span>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {verificationUrl && (
+                                        <div className="setup-part" style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1rem', marginTop: '1rem' }}>
+                                            <p style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                PART 2 — Create the Job Filter
+                                                <span style={{ fontSize: '0.6rem', background: 'rgba(255,255,255,0.1)', padding: '2px 4px', borderRadius: '4px' }}>OPTIONAL</span>
+                                            </p>
+                                            <ol style={{ paddingLeft: '1.25rem' }}>
+                                                <li>In Gmail, click the search bar filter icon.</li>
+                                                <li>
+                                                    Paste this in <strong>"Has the words"</strong>:
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', background: 'rgba(255,255,255,0.05)', padding: '4px 8px', borderRadius: '4px' }}>
+                                                        <code style={{ fontSize: '0.7rem', color: 'var(--primary-color)', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                            (subject:job OR subject:career OR subject:position OR subject:interview OR subject:offer OR recruiter OR hiring OR "job application" OR "career opportunity")
+                                                        </code>
+                                                        <button
+                                                            onClick={() => {
+                                                                navigator.clipboard.writeText('(subject:job OR subject:career OR subject:position OR subject:interview OR subject:offer OR recruiter OR hiring OR "job application" OR "career opportunity")');
+                                                                alert('Filter copied!');
+                                                            }}
+                                                            style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
+                                                        >
+                                                            <Copy size={12} />
+                                                        </button>
+                                                    </div>
+                                                </li>
+                                                <li>Click <strong>Create filter</strong> &gt; <strong>Forward it to</strong> &gt; select alias.</li>
+                                            </ol>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </details>

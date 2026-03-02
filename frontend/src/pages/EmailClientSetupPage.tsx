@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, CheckCircle, ArrowRight, RefreshCcw, Send, Copy, Check } from 'lucide-react';
+import { Mail, CheckCircle, ArrowRight, RefreshCcw, Send, Copy, Check, ExternalLink, ShieldCheck } from 'lucide-react';
 import { setupForwarder, getMe, getForwardingVerification } from '../api/client';
 import './EmailClientSetupPage.css';
 
@@ -52,6 +52,8 @@ export default function EmailClientSetupPage() {
             setIsSimulating(false);
         }
     };
+
+    const [showVideo, setShowVideo] = useState(false);
 
     // Poll for the Gmail verification link when the user clicks "I have added the address"
     useEffect(() => {
@@ -169,72 +171,110 @@ export default function EmailClientSetupPage() {
 
                         <div className="instructions-box">
                             {client === 'gmail' ? (
-                                <div className="gmail-setup-guide">
-                                    <div className="setup-part">
-                                        <h4>PART 1 — Enable Forwarding</h4>
-                                        <ol>
-                                            <li>Open <strong>Gmail settings</strong> (gear icon) &gt; <strong>See all settings</strong>.</li>
-                                            <li>Go to the <strong>Forwarding and POP/IMAP</strong> tab.</li>
-                                            <li>Click <strong>Add a forwarding address</strong>.</li>
-                                            <li>
-                                                Enter your alias:
-                                                <div className="copy-code-wrapper" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginLeft: '8px' }}>
-                                                    <code className="highlight-code" style={{ margin: 0 }}>{alias}@trackyjobby.com</code>
-                                                    <button
-                                                        className="copy-icon-btn"
-                                                        onClick={() => handleCopy(`${alias}@trackyjobby.com`)}
-                                                        title="Copy to clipboard"
-                                                        style={{
-                                                            background: 'none',
-                                                            border: 'none',
-                                                            color: 'var(--text-secondary)',
-                                                            cursor: 'pointer',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            padding: '4px',
-                                                            borderRadius: '4px',
-                                                            transition: 'all 0.2s'
-                                                        }}
-                                                    >
-                                                        {copied ? <Check size={14} className="text-success" /> : <Copy size={14} />}
-                                                    </button>
-                                                </div>
-                                            </li>
-                                            <li>Click <strong>Next</strong> &gt; <strong>Proceed</strong>. Gmail will send a confirmation link to us.</li>
-                                        </ol>
-                                        <div className="warning-note" style={{ fontSize: '0.8rem', color: '#ffab00', marginTop: '0.5rem', display: 'flex', gap: '8px' }}>
-                                            <CheckCircle size={14} style={{ flexShrink: 0 }} />
-                                            <span>After verifying, do <strong>NOT</strong> chose "Forward a copy of all incoming mail". We will use a filter instead.</span>
-                                        </div>
+                                <>
+                                    <div className="setup-tabs" style={{ display: 'flex', gap: '10px', marginBottom: '1.5rem' }}>
+                                        <button
+                                            className={`tab-btn ${!showVideo ? 'active' : ''}`}
+                                            onClick={() => setShowVideo(false)}
+                                            style={{
+                                                flex: 1,
+                                                padding: '10px',
+                                                borderRadius: '8px',
+                                                border: '1px solid rgba(255,255,255,0.1)',
+                                                background: !showVideo ? 'rgba(255,255,255,0.1)' : 'transparent',
+                                                color: !showVideo ? 'var(--primary-color)' : 'var(--text-secondary)',
+                                                fontSize: '0.875rem',
+                                                fontWeight: 600,
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: '8px'
+                                            }}
+                                        >
+                                            <ExternalLink size={16} />
+                                            Written Steps
+                                        </button>
+                                        <button
+                                            className={`tab-btn ${showVideo ? 'active' : ''}`}
+                                            onClick={() => setShowVideo(true)}
+                                            style={{
+                                                flex: 1,
+                                                padding: '10px',
+                                                borderRadius: '8px',
+                                                border: '1px solid rgba(255,255,255,0.1)',
+                                                background: showVideo ? 'rgba(255,255,255,0.1)' : 'transparent',
+                                                color: showVideo ? 'var(--primary-color)' : 'var(--text-secondary)',
+                                                fontSize: '0.875rem',
+                                                fontWeight: 600,
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: '8px'
+                                            }}
+                                        >
+                                            <ShieldCheck size={16} />
+                                            Video Tutorial
+                                        </button>
                                     </div>
 
-                                    <div className="setup-part" style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-                                        <h4>PART 2 — Create the Job Filter</h4>
-                                        <ol>
-                                            <li>In Gmail, click the <strong>search bar</strong>.</li>
-                                            <li>Click the <strong>Filter icon</strong> (right side of search bar).</li>
-                                            <li>
-                                                Paste this in the <strong>"Has the words"</strong> field:
-                                                <div className="copy-code-wrapper" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px', background: 'rgba(255,255,255,0.05)', padding: '6px 10px', borderRadius: '4px' }}>
-                                                    <code style={{ fontSize: '0.75rem', color: 'var(--primary-color)', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                                        (subject:job OR subject:career OR subject:position OR subject:interview OR subject:offer OR recruiter OR hiring OR "job application" OR "career opportunity")
-                                                    </code>
-                                                    <button
-                                                        className="copy-icon-btn"
-                                                        onClick={() => handleCopy('(subject:job OR subject:career OR subject:position OR subject:interview OR subject:offer OR recruiter OR hiring OR "job application" OR "career opportunity")')}
-                                                        style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
-                                                    >
-                                                        {copied ? <Check size={14} className="text-success" /> : <Copy size={14} />}
-                                                    </button>
+                                    <div className="instructions-box" style={{ minHeight: '300px', border: 'none', background: 'transparent', padding: 0 }}>
+                                        {showVideo ? (
+                                            <div className="video-wrapper" style={{ borderRadius: '12px', overflow: 'hidden', background: '#000', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                                <video
+                                                    src="https://storage.googleapis.com/support-kms-prod/Cm6cYtX7pQvTaMzx3ADskquczoegpK3vShee"
+                                                    controls
+                                                    autoPlay
+                                                    muted
+                                                    loop
+                                                    playsInline
+                                                    style={{ width: '100%', display: 'block' }}
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="gmail-setup-guide">
+                                                <div className="setup-part">
+                                                    <h4>PART 1 — Enable Forwarding</h4>
+                                                    <ol>
+                                                        <li>Open <strong>Gmail settings</strong> (gear icon) &gt; <strong>See all settings</strong>.</li>
+                                                        <li>Go to the <strong>Forwarding and POP/IMAP</strong> tab.</li>
+                                                        <li>Click <strong>Add a forwarding address</strong>.</li>
+                                                        <li>
+                                                            Enter your alias:
+                                                            <div className="copy-code-wrapper" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginLeft: '8px' }}>
+                                                                <code className="highlight-code" style={{ margin: 0 }}>{alias}@trackyjobby.com</code>
+                                                                <button
+                                                                    className="copy-icon-btn"
+                                                                    onClick={() => handleCopy(`${alias}@trackyjobby.com`)}
+                                                                    title="Copy to clipboard"
+                                                                    style={{
+                                                                        background: 'none',
+                                                                        border: 'none',
+                                                                        color: 'var(--text-secondary)',
+                                                                        cursor: 'pointer',
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        padding: '4px',
+                                                                        borderRadius: '4px',
+                                                                        transition: 'all 0.2s'
+                                                                    }}
+                                                                >
+                                                                    {copied ? <Check size={14} className="text-success" /> : <Copy size={14} />}
+                                                                </button>
+                                                            </div>
+                                                        </li>
+                                                        <li>Click <strong>Next</strong> &gt; <strong>Proceed</strong>. Gmail will send a confirmation link to us.</li>
+                                                    </ol>
+                                                    <div className="warning-note" style={{ fontSize: '0.8rem', color: '#ffab00', marginTop: '1rem', display: 'flex', gap: '8px', padding: '10px', background: 'rgba(255,171,0,0.05)', borderRadius: '6px' }}>
+                                                        <Mail size={14} style={{ flexShrink: 0 }} />
+                                                        <span>After clicking the link we receive, stay on this page. We will then set up a filter to only forward job emails.</span>
+                                                    </div>
                                                 </div>
-                                            </li>
-                                            <li>Click <strong>Create filter</strong>.</li>
-                                            <li>Check <strong>Forward it to</strong> and select your <code>{alias}@trackyjobby.com</code> address.</li>
-                                            <li>(Optional) Check <strong>Never send it to Spam</strong>.</li>
-                                            <li>Click <strong>Create filter</strong>.</li>
-                                        </ol>
+                                            </div>
+                                        )}
                                     </div>
-                                </div>
+                                </>
                             ) : (
                                 <p>
                                     Set up a forwarding rule in your email client to forward all job-related emails to:
@@ -282,29 +322,72 @@ export default function EmailClientSetupPage() {
                         <p className="subtitle">We just received the forwarding confirmation email from Gmail.</p>
 
                         <div className="instructions-box" style={{ textAlign: 'left', marginBottom: '2rem' }}>
-                            <p style={{ fontSize: '0.875rem', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>
-                                Click the link below to confirm the forwarding in Gmail:
+                            <p style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.75rem', color: 'var(--text-primary)' }}>
+                                1. Finalize Forwarding (Required)
+                            </p>
+                            <p style={{ fontSize: '0.875rem', marginBottom: '0.75rem' }}>
+                                Click the link below to confirm the forwarding address in Gmail:
                             </p>
                             <a
                                 href={mockVerifyLink || '#'}
                                 target="_blank"
                                 rel="noreferrer"
-                                onClick={() => {
-                                    // Give them a moment to actually click/confirm before moving on
-                                    setTimeout(() => {
-                                        setStep('test');
-                                    }, 2000);
-                                }}
                                 style={{
+                                    display: 'block',
+                                    padding: '12px',
+                                    background: 'rgba(59, 130, 246, 0.1)',
+                                    borderRadius: '6px',
+                                    border: '1px solid var(--info-color)',
                                     wordBreak: 'break-all',
                                     color: 'var(--info-color)',
                                     fontSize: '0.875rem',
-                                    textDecoration: 'underline'
+                                    textDecoration: 'none',
+                                    textAlign: 'center',
+                                    fontWeight: 600,
+                                    marginBottom: '1.5rem'
                                 }}
                             >
-                                {mockVerifyLink}
+                                Confirm Verification Link
                             </a>
+
+                            <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.5rem', marginTop: '1.5rem' }}>
+                                <p style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.75rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    2. Create Job Filter (Optional but Recommended)
+                                    <span style={{ fontSize: '0.7rem', background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '4px', fontWeight: 400 }}>OPTIONAL</span>
+                                </p>
+                                <p style={{ fontSize: '0.875rem', marginBottom: '0.75rem', opacity: 0.8 }}>
+                                    If you don't want to forward *every* email to TrackyJobby, create a search filter:
+                                </p>
+                                <ol style={{ paddingLeft: '1.25rem', fontSize: '0.875rem', lineHeight: '1.6' }}>
+                                    <li>In Gmail, click the <strong>Filter icon</strong> in the search bar.</li>
+                                    <li>
+                                        Paste this in <strong>"Has the words"</strong>:
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px', background: 'rgba(255,255,255,0.05)', padding: '8px', borderRadius: '4px' }}>
+                                            <code style={{ fontSize: '0.75rem', color: 'var(--primary-color)', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                (subject:job OR subject:career OR subject:position OR subject:interview OR subject:offer OR recruiter OR hiring OR "job application" OR "career opportunity")
+                                            </code>
+                                            <button
+                                                className="copy-icon-btn"
+                                                onClick={() => handleCopy('(subject:job OR subject:career OR subject:position OR subject:interview OR subject:offer OR recruiter OR hiring OR "job application" OR "career opportunity")')}
+                                                style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
+                                            >
+                                                {copied ? <Check size={14} className="text-success" /> : <Copy size={14} />}
+                                            </button>
+                                        </div>
+                                    </li>
+                                    <li>Click <strong>Create filter</strong>.</li>
+                                    <li>Check <strong>Forward it to</strong> and select your alias.</li>
+                                    <li>Click <strong>Create filter</strong>.</li>
+                                </ol>
+                            </div>
                         </div>
+
+                        <button
+                            className="primary-btn continue-btn"
+                            onClick={() => setStep('test')}
+                        >
+                            I've finished setup
+                        </button>
 
                         <button className="back-btn mt-2" onClick={() => setStep('instructions')}>Back to Instructions</button>
                     </div>
