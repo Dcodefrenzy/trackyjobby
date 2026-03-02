@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { User, Mail, LogOut, Copy, ExternalLink, ShieldCheck, MailWarning, ArrowLeft, CreditCard, Loader2 } from 'lucide-react';
+import { User, Mail, LogOut, Copy, ExternalLink, ShieldCheck, MailWarning, ArrowLeft, CreditCard, Loader2, Settings } from 'lucide-react';
 import { createPortalSession, getForwardingVerification } from '../api/client';
 import './ProfilePage.css';
 
@@ -285,11 +285,31 @@ export default function ProfilePage() {
                                 <ExternalLink size={14} className="ml-auto" />
                             </summary>
                             <div className="step-content">
-                                <ol>
-                                    <li>Open <strong>Outlook Web Settings</strong> &gt; <strong>Mail</strong> &gt; <strong>Forwarding</strong>.</li>
-                                    <li>Select <strong>Enable forwarding</strong>.</li>
-                                    <li>Enter your TrackyJobby alias and click <strong>Save</strong>.</li>
-                                </ol>
+                                <div className="outlook-setup-guide" style={{ fontSize: '0.875rem' }}>
+                                    <div className="setup-part" style={{ marginBottom: '1.5rem' }}>
+                                        <div className="tutorial-visual" style={{ marginBottom: '1rem', borderRadius: '8px', overflow: 'hidden', background: '#000', border: '1px solid rgba(255,255,255,0.1)', aspectRatio: '16/9' }}>
+                                            <iframe
+                                                width="100%"
+                                                height="100%"
+                                                src="https://www.youtube.com/embed/XKwOvAv3Cs8"
+                                                title="Outlook Forwarding Tutorial"
+                                                frameBorder="0"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowFullScreen
+                                                style={{ display: 'block' }}
+                                            ></iframe>
+                                        </div>
+                                        <ol style={{ paddingLeft: '1.25rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                                            <li>At the top window of the new Outlook, select <strong>Settings</strong> <Settings size={14} style={{ display: 'inline', verticalAlign: 'middle', opacity: 0.7 }} /> .</li>
+                                            <li>Select <strong>Mail</strong> &gt; <strong>Forwarding</strong>.</li>
+                                            <li>
+                                                Toggle the <strong>Enable forwarding</strong> switch, enter the address:
+                                                <div style={{ marginTop: '4px' }}><code style={{ background: 'var(--card-bg)', border: '1px solid var(--border-color)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.8rem', color: 'var(--text-primary)' }}>{user.forwardingEmail}</code></div>
+                                            </li>
+                                            <li>Select <strong>Keep a copy of forwarded messages</strong> and select <strong>Save</strong>.</li>
+                                        </ol>
+                                    </div>
+                                </div>
                             </div>
                         </details>
 
