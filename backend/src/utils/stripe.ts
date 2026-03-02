@@ -36,7 +36,7 @@ export const STRIPE_PLANS = {
     }
 };
 
-export async function createCheckoutSession(userId: string, userEmail: string, planId: string) {
+export async function createCheckoutSession(userId: string, userEmail: string, planId: string, customerId?: string) {
     const plan = Object.values(STRIPE_PLANS).find(p => p.id === planId);
     const baseUrl = getBaseUrl();
 
@@ -51,7 +51,7 @@ export async function createCheckoutSession(userId: string, userEmail: string, p
         console.warn('⚠️ [STRIPE] Using TEST MODE secret key. Ensure price IDs match.');
     }
 
-    const session = await stripe.checkout.sessions.create({
+    const sessionOptions: Stripe.Checkout.SessionCreateParams = {
         payment_method_types: ['card'],
         line_items: [
             {
@@ -60,7 +60,6 @@ export async function createCheckoutSession(userId: string, userEmail: string, p
             },
         ],
         mode: 'subscription',
-        customer_email: userEmail,
         client_reference_id: userId,
         subscription_data: {
             trial_period_days: 3,
@@ -75,7 +74,15 @@ export async function createCheckoutSession(userId: string, userEmail: string, p
             userId,
             planId,
         },
-    });
+    };
+
+    if (customerId) {
+        sessionOptions.customer = customerId;
+    } else if (userEmail) {
+        sessionOptions.customer_email = userEmail;
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionOptions);
 
     return session;
 }

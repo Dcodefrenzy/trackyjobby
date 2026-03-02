@@ -18,10 +18,10 @@ router.post('/create-session', authenticate, async (req: any, res) => {
     const userId = req.userId;
 
     try {
-        // 1. Get user email from Supabase
+        // 1. Get user email and stripe_customer_id from Supabase
         const { data: user, error: userError } = await supabase
             .from('users')
-            .select('email')
+            .select('email, stripe_customer_id')
             .eq('id', userId)
             .single();
 
@@ -30,11 +30,25 @@ router.post('/create-session', authenticate, async (req: any, res) => {
         }
 
         // 2. Create the session
-        const session = await createCheckoutSession(userId, user.email, planId);
+        const session = await createCheckoutSession(userId, user.email, planId, user.stripe_customer_id);
 
         res.json({ url: session.url });
     } catch (err: any) {
         console.error('❌ [PAYMENT] Error creating session:', err.message);
+
+        // If the provided customer ID is invalid (e.g. from a different Stripe account),
+        // we should probably clear it and try one more time without it.
+        if (err.message && err.message.toLowerCase().includes('no such customer')) {
+            console.log(`⚠️ [PAYMENT] Clearing invalid customer ID ${userId} and retrying...`);
+            await supabase
+                .from('users')
+                .update({ stripe_customer_id: null })
+                .eq('id', userId);
+
+            return res.status(400).json({
+                error: 'Your payment profile was invalid. We have reset it. Please try again now.'
+            });
+        }
         res.status(500).json({
             error: `Stripe Checkout Failed: ${err.message}`,
             details: process.env.NODE_ENV === 'development' ? err.stack : undefined

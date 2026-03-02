@@ -47,18 +47,32 @@ router.post('/stripe', async (req: Request, res: Response) => {
             case 'customer.subscription.created':
             case 'customer.subscription.updated': {
                 const subscription = event.data.object as Stripe.Subscription;
-                const userId = subscription.metadata.userId;
+                let userId = subscription.metadata.userId;
                 const planId = subscription.metadata.planId;
+                const customerId = subscription.customer as string;
+
+                console.log(`🔍 [STRIPE] Subscription Event: ${event.type} (Customer: ${customerId})`);
+
+                if (!userId) {
+                    console.log(`ℹ️ [STRIPE] userId missing from metadata, looking up by customerId: ${customerId}`);
+                    const { data: user } = await supabase
+                        .from('users')
+                        .select('id')
+                        .eq('stripe_customer_id', customerId)
+                        .single();
+
+                    if (user) userId = user.id;
+                }
 
                 if (userId) {
-                    console.log(`🔍 [STRIPE] Subscription State - Status: ${subscription.status}, CancelAtEnd: ${subscription.cancel_at_period_end}`);
+                    console.log(`🔍 [STRIPE] Updating subscription for user ${userId} - Status: ${subscription.status}`);
                     const status = subscription.cancel_at_period_end ? 'canceled' : subscription.status;
 
                     const { error } = await supabase
                         .from('users')
                         .update({
                             subscription_status: status,
-                            stripe_customer_id: subscription.customer as string,
+                            stripe_customer_id: customerId,
                             stripe_subscription_id: subscription.id,
                             plan_id: planId
                         })
@@ -69,6 +83,8 @@ router.post('/stripe', async (req: Request, res: Response) => {
                     } else {
                         console.log(`✅ [STRIPE] Updated subscription for user ${userId}: ${status}`);
                     }
+                } else {
+                    console.warn(`⚠️ [STRIPE] Could not identify user for subscription ${subscription.id}`);
                 }
                 break;
             }
