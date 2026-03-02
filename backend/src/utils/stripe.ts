@@ -67,8 +67,10 @@ export async function createPortalSession(customerId: string) {
         return_url: `${process.env.APP_URL || 'http://localhost:5174'}/dashboard?portal=return`,
     };
 
-    if (process.env.STRIPE_PORTAL_CONFIG_ID) {
-        portalOptions.configuration = process.env.STRIPE_PORTAL_CONFIG_ID;
+    const portalConfigId = process.env.STRIPE_PORTAL_CONFIG_ID || 'bpc_1T6ZCZH5khr25gCNYiTxTvLW';
+
+    if (portalConfigId) {
+        portalOptions.configuration = portalConfigId;
     }
 
     const session = await stripe.billingPortal.sessions.create(portalOptions);
