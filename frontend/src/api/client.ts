@@ -74,4 +74,7 @@ export const submitFeedback = (category: string, message: string) =>
 export const createPortalSession = (): Promise<{ url: string }> =>
     api.post('/api/payment/create-portal-session').then((r) => r.data);
 
+export const createCheckoutSession = (planId: string): Promise<{ url: string }> =>
+    api.post('/api/payment/create-session', { planId }).then((r) => r.data);
+
 export default api;

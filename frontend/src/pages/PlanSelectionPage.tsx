@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, Target } from 'lucide-react';
+import { createCheckoutSession } from '../api/client';
 import './LandingPage.css'; // Reuse glassmorphism styles
 
 const PlanSelectionPage: React.FC = () => {
@@ -13,22 +14,11 @@ const PlanSelectionPage: React.FC = () => {
         setError(null);
 
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/payment/create-session`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ planId })
-            });
-
-            const data = await response.json();
-
+            const data = await createCheckoutSession(planId);
             if (data.url) {
                 window.location.href = data.url;
             } else {
-                throw new Error(data.error || 'Failed to create payment session');
+                throw new Error('Failed to create payment session');
             }
         } catch (err: any) {
             console.error('❌ [PLAN] Selection error:', err);
