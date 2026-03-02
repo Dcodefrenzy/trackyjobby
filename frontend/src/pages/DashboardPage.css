@@ -1,0 +1,610 @@
+/* Dashboard Layout & Utilities */
+.dashboard-container {
+    max-width: 1000px;
+    width: 100%;
+    margin: 0 auto;
+    padding-bottom: 4rem;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.dashboard-header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dashboard-header h1 {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.dashboard-header p {
+    font-size: 0.875rem;
+}
+
+.btn-outline {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-outline:hover {
+    background: var(--card-hover);
+    border-color: #333;
+}
+
+/* Metrics Grid - Minimalist style */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 3rem;
+}
+
+.metric-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: border-color 0.2s;
+}
+
+.metric-card:hover {
+    border-color: #444;
+}
+
+.metric-card h4 {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.metric-value {
+    display: flex;
+    flex-direction: column;
+}
+
+.metric-value h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    letter-spacing: -0.05em;
+}
+
+.metric-value span {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Utilities for Colors */
+.text-success {
+    color: var(--success-color);
+}
+
+.text-danger {
+    color: var(--danger-color);
+}
+
+.text-info {
+    color: var(--info-color);
+}
+
+.text-muted {
+    color: var(--text-secondary);
+}
+
+/* Filter Section */
+.filter-section {
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0rem;
+    margin-top: -1rem;
+}
+
+.filter-section h3 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.filter-section p {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.filter-dropdown-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.filter-dropdown-select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 0.5rem 2.5rem 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--card-bg);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: border-color 0.2s ease;
+    cursor: pointer;
+    outline: none;
+    font-family: inherit;
+}
+
+.filter-dropdown-select:hover {
+    border-color: #444;
+}
+
+.filter-chevron {
+    position: absolute;
+    right: 0.75rem;
+    pointer-events: none;
+    color: var(--text-secondary);
+}
+
+/* Application Sections */
+.application-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+.section-header {
+    margin-bottom: 1rem;
+}
+
+.section-header h3 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.section-header p {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+/* Badges */
+.badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: 1px solid transparent;
+}
+
+.badge-success {
+    background: var(--success-light);
+    color: var(--success-color);
+    border-color: rgba(34, 197, 94, 0.2);
+}
+
+.badge-primary {
+    background: var(--info-light);
+    color: var(--info-color);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.badge-muted {
+    background: var(--boder-color);
+    color: var(--text-secondary);
+    border-color: var(--border-color);
+}
+
+/* Empty States */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    background: var(--app-bg);
+    border: 1px dashed var(--border-color);
+    border-radius: 8px;
+    gap: 0.5rem;
+}
+
+.empty-state h4 {
+    font-size: 0.875rem;
+    margin-top: 1rem;
+    font-weight: 500;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+}
+
+/* Active Apps Grid */
+.apps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.job-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.job-card:hover {
+    border-color: #444;
+    transform: translateY(-2px);
+}
+
+.job-card-header .gap-3 {
+    gap: 0.75rem;
+}
+
+.company-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #fff;
+}
+
+/* Base colors for mock logos without being gaudy */
+.bg-purple-600 {
+    background-color: #9333ea;
+}
+
+.bg-gray-800 {
+    background-color: #1f2937;
+}
+
+.bg-black {
+    background-color: #000;
+    border: 1px solid #333;
+}
+
+.bg-gray-200 {
+    background-color: #e5e7eb;
+    color: #000;
+}
+
+.bg-emerald-500 {
+    background-color: #10b981;
+}
+
+.bg-purple-500 {
+    background-color: #a855f7;
+}
+
+.job-card h4 {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.status-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-applied {
+    background: var(--warning-light);
+    color: var(--warning-color);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.job-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem 0.5rem;
+}
+
+.detail-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+}
+
+.detail-item svg {
+    color: #666;
+    margin-top: 2px;
+}
+
+.detail-item .col {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-item .label {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.125rem;
+    color: var(--border-color);
+    /* slightly darker text */
+}
+
+.job-card-footer {
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+    font-size: 0.75rem;
+    color: #666;
+}
+
+/* Clickable Cards */
+.job-card.clickable {
+    cursor: pointer;
+}
+
+.job-card.clickable:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    padding: 2rem;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close:hover {
+    background: var(--card-hover);
+    color: var(--text-primary);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+}
+
+.modal-company-info {
+    display: flex;
+    gap: 1.25rem;
+    align-items: center;
+}
+
+.modal-logo {
+    width: 64px;
+    height: 64px;
+    background: var(--bg-color);
+    border-radius: 12px;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.modal-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.modal-company-name {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.big-badge {
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+    text-transform: capitalize;
+}
+
+.modal-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.modal-detail-item {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.modal-detail-item svg {
+    color: var(--text-secondary);
+}
+
+.modal-detail-item label {
+    display: block;
+    font-size: 0.6875rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.125rem;
+}
+
+.modal-detail-item span {
+    font-size: 0.9375rem;
+    font-weight: 500;
+}
+
+.modal-journey h3 {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.journey-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0rem;
+    padding-left: 0.5rem;
+}
+
+.journey-step {
+    display: flex;
+    gap: 1.5rem;
+    position: relative;
+    padding-bottom: 2rem;
+}
+
+.journey-step:last-child {
+    padding-bottom: 0;
+}
+
+.journey-step::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 24px;
+    bottom: 0;
+    width: 2px;
+    background: var(--border-color);
+}
+
+.journey-step:last-child::before {
+    display: none;
+}
+
+.step-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-secondary);
+}
+
+.journey-step.completed .step-icon {
+    border-color: var(--success-color);
+}
+
+.journey-step.completed .dot {
+    background: var(--success-color);
+}
+
+.journey-step.active .step-icon {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.2);
+}
+
+.journey-step.active .dot {
+    background: var(--primary-color);
+}
+
+.journey-step.rejected .step-icon {
+    border-color: var(--danger-color);
+}
+
+.journey-step.rejected .dot {
+    background: var(--danger-color);
+}
+
+.journey-step.success .step-icon {
+    border-color: var(--success-color);
+    background: var(--success-light);
+}
+
+.step-info h4 {
+    font-size: 0.9375rem;
+    margin-bottom: 0.25rem;
+}
+
+.step-info p {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.status-interview {
+    background: var(--info-light);
+    color: var(--info-color);
+}
+
+.status-rejected {
+    background: var(--danger-light);
+    color: var(--danger-color);
+}
+
+.status-offer,
+.status-accepted {
+    background: var(--success-light);
+    color: var(--success-color);
+}

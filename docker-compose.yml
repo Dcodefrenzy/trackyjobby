@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  trackyjobby-backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: trackyjobby-api
+    restart: always
+    env_file:
+      - ./backend/.env
+    ports:
+      # Bind to localhost only for security. Nginx on VPS will proxy traffic here.
+      - "127.0.0.1:3001:3001"
+
+  trackyjobby-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # We tell the frontend that the API lives on the same domain at /api/
+        VITE_API_URL: "/"
+    container_name: trackyjobby-web
+    restart: always
+    ports:
+      # Bind to localhost only. Nginx on VPS will proxy traffic here.
+      - "127.0.0.1:3000:80"

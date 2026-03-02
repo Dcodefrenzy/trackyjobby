@@ -1,0 +1,52 @@
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 3rem;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--app-bg);
+    height: 64px;
+}
+
+.nav-logo {
+    font-weight: 600;
+    font-size: 1.125rem;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.feedback-trigger:hover {
+    color: #10b981 !important;
+    /* var(--primary-color) */
+    filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.4));
+}
+
+.nav-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: var(--text-secondary);
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.nav-icon-btn:hover {
+    background: var(--card-hover);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+.profile-btn {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
