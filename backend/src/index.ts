@@ -11,7 +11,7 @@ import feedbackRoutes from './routes/feedback';
 import paymentRoutes from './routes/payment';
 
 const app = express();
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 // Preserve raw body for webhook signature verification
