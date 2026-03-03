@@ -137,6 +137,15 @@ export default function EmailClientSetupPage() {
                         <h2>Create your forwarding alias</h2>
                         <p className="subtitle">This is the unique address you will forward job applications to.</p>
 
+                        <div className="safe-forwarding-notice" style={{ background: 'rgba(56, 189, 248, 0.05)', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '16px', borderRadius: '8px', marginBottom: '2rem', textAlign: 'left' }}>
+                            <p style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, color: 'var(--info-color)', marginBottom: '8px', fontSize: '0.9rem' }}>
+                                <ShieldCheck size={18} /> Privacy First: Stay in Control
+                            </p>
+                            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6', margin: 0 }}>
+                                We know setting up email forwarding can feel anxious. <strong>We do not store your emails.</strong> Our system only extracts the tracking information (like status, company, and role) from job-related emails so you can see where you are in a particular application. We recommend setting up filters in your provider so <em>only</em> job-related emails are forwarded.
+                            </p>
+                        </div>
+
                         <div className="input-group">
                             <input
                                 type="text"

@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Briefcase, MapPin, DollarSign, Calendar, Trash2, Check, ChevronDown, Loader2, X, Clock } from 'lucide-react';
+import { Briefcase, MapPin, DollarSign, Calendar, Trash2, Check, ChevronDown, Loader2, X, Clock, MailWarning } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { getJobs, type JobApplication } from '../api/client';
 import TrialBanner from '../components/TrialBanner';
 import './DashboardPage.css';
 
 export default function DashboardPage() {
-    const { refreshUser } = useAuth();
+    const { user, refreshUser } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
     const [jobs, setJobs] = useState<JobApplication[] | null>(null);
@@ -55,6 +55,38 @@ export default function DashboardPage() {
     return (
         <div className="dashboard-container animate-fade-in">
             <TrialBanner />
+
+            {/* Missing Alias Setup Banner */}
+            {!user?.mailForwarder && (
+                <div className="setup-alert" style={{
+                    background: 'rgba(255, 171, 0, 0.1)',
+                    border: '1px solid #ffab00',
+                    color: '#ffab00',
+                    padding: '1rem',
+                    borderRadius: '8px',
+                    marginBottom: '1.5rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '1rem'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <MailWarning size={20} style={{ flexShrink: 0 }} />
+                        <div>
+                            <strong style={{ display: 'block', fontSize: '0.95rem', marginBottom: '2px' }}>Email Forwarding Not Configured</strong>
+                            <span style={{ fontSize: '0.85rem', opacity: 0.9 }}>You won't receive job application updates until you set up your forwarding alias.</span>
+                        </div>
+                    </div>
+                    <button
+                        className="primary-btn"
+                        onClick={() => navigate('/setup/email-client')}
+                        style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', whiteSpace: 'nowrap' }}
+                    >
+                        Complete Setup
+                    </button>
+                </div>
+            )}
+
             {/* Header */}
             <header className="dashboard-header flex-between">
                 <div>
