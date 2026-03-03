@@ -7,10 +7,7 @@ import { sendVerificationEmail } from '../utils/email';
 
 const router = Router();
 
-const mailDomain = () => {
-    const domain = process.env.MAIL_DOMAIN || 'trackyjobby.com';
-    return domain.replace(/^https?:\/\//, '').replace(/\/$/, '');
-};
+const mailDomain = () => process.env.MAIL_DOMAIN || 'trackyjobby.com';
 const forwardingEmail = (forwarder: string) => `${forwarder}@${mailDomain()}`;
 
 // ─── STEP 1: Register ────────────────────────────────────────────────────────
