@@ -251,8 +251,8 @@ export default function EmailClientSetupPage() {
                                             <li>Click <strong>Next</strong> &gt; <strong>Proceed</strong>. Gmail will send a confirmation link to us.</li>
                                         </ol>
                                         <div className="warning-note" style={{ fontSize: '0.8rem', color: '#ffab00', marginTop: '1rem', display: 'flex', gap: '8px', padding: '10px', background: 'rgba(255,171,0,0.05)', borderRadius: '6px' }}>
-                                            <Mail size={14} style={{ flexShrink: 0 }} />
-                                            <span>After clicking the link we receive, stay on this page. We will then set up a filter to only forward job emails.</span>
+                                            <Mail size={14} style={{ flexShrink: 0, marginTop: '2px' }} />
+                                            <span style={{ lineHeight: '1.4' }}>After you add the address, click the <strong>"I have added the address"</strong> button below. We will verify the link from Google, and then guide you to set up a filter so only job emails are forwarded.</span>
                                         </div>
                                     </div>
                                 </div>
