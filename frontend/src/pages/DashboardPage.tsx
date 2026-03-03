@@ -57,7 +57,7 @@ export default function DashboardPage() {
             <TrialBanner />
 
             {/* Missing Alias Setup Banner */}
-            {!user?.mailForwarder && (
+            {!user?.mail_forwarder && (
                 <div className="setup-alert" style={{
                     background: 'rgba(255, 171, 0, 0.1)',
                     border: '1px solid #ffab00',
