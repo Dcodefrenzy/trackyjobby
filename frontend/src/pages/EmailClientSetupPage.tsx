@@ -261,7 +261,7 @@ export default function EmailClientSetupPage() {
                                         </ol>
                                         <div className="warning-note" style={{ fontSize: '0.8rem', color: '#ffab00', marginTop: '1rem', display: 'flex', gap: '8px', padding: '10px', background: 'rgba(255,171,0,0.05)', borderRadius: '6px' }}>
                                             <Mail size={14} style={{ flexShrink: 0, marginTop: '2px' }} />
-                                            <span style={{ lineHeight: '1.4' }}>After you add the address, click the <strong>"I have added the address"</strong> button below. We will verify the link from Google, and then guide you to set up a filter so only job emails are forwarded.</span>
+                                            <span style={{ lineHeight: '1.4' }}><strong>Important:</strong> Global forwarding is disabled by default in Gmail even after confirming, and we keep it this way. You MUST set up a filter to actually forward your job emails! This means <strong>your personal and non-job related mail will not be forwarded to us.</strong> After you add the address, click the <strong>"I have added the address"</strong> button below to start building your secure filter.</span>
                                         </div>
                                     </div>
                                 </div>
