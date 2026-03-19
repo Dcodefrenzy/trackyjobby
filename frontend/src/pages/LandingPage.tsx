@@ -1,12 +1,13 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, BarChart3, ShieldCheck, ChevronRight, Zap, Target, Check } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import './LandingPage.css';
 
 export default function LandingPage() {
     const { user, loading } = useAuth();
     const navigate = useNavigate();
+    const [showExtModal, setShowExtModal] = useState(false);
 
     useEffect(() => {
         if (!loading && user) {
@@ -47,9 +48,12 @@ export default function LandingPage() {
                         <Link to="/auth/register" className="btn-primary">
                             Get Started Free <ChevronRight size={18} />
                         </Link>
-                        <a href="#" className="btn-secondary">
+                        <button 
+                          onClick={() => setShowExtModal(true)} 
+                          className="btn-secondary"
+                        >
                           <Zap size={18} /> Get the Extension
-                        </a>
+                        </button>
                     </div>
                 </div>
 
@@ -229,6 +233,28 @@ export default function LandingPage() {
                     &copy; 2026 TrackyJobby. All rights reserved.
                 </div>
             </footer>
+            {/* Extension Modal */}
+            {showExtModal && (
+                <div className="ext-modal-overlay" onClick={() => setShowExtModal(false)}>
+                    <div className="ext-modal glass" onClick={e => e.stopPropagation()}>
+                        <div className="ext-modal-icon">
+                            <Zap size={32} className="text-warning" />
+                        </div>
+                        <h3>Extension Coming Soon! 🚀</h3>
+                        <p>
+                            Our Chrome Extension is currently undergoing final review with the Google Web Store team. 
+                            <strong> Stay tuned!</strong> Very soon, you'll be able to track and organize your 
+                            bookmarked applications with just one click.
+                        </p>
+                        <button 
+                            className="btn-primary-sm" 
+                            onClick={() => setShowExtModal(false)}
+                        >
+                            Got it!
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
