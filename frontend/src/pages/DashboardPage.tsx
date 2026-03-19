@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Briefcase, MapPin, DollarSign, Calendar, Trash2, Check, ChevronDown, Loader2, X, Clock, MailWarning } from 'lucide-react';
+import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
+import { Briefcase, MapPin, DollarSign, Calendar, Trash2, Check, ChevronDown, Loader2, X, Clock, MailWarning, Edit2, Home, GraduationCap, Award, ExternalLink } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
-import { getJobs, type JobApplication } from '../api/client';
+import { getJobs, deleteJob, updateJob, type JobApplication } from '../api/client';
+import { CATEGORIES, type CategoryId } from '../config/categories';
 import TrialBanner from '../components/TrialBanner';
 import './DashboardPage.css';
 
@@ -15,6 +16,75 @@ export default function DashboardPage() {
     const [selectedJob, setSelectedJob] = useState<JobApplication | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [statusFilter, setStatusFilter] = useState('All status');
+    
+    // Get activeCategory from AppLayout context
+    const { activeCategory, setActiveCategory } = useOutletContext<{ activeCategory: CategoryId, setActiveCategory: (c: CategoryId) => void }>();
+    
+    // Edit Modal State
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editingJob, setEditingJob] = useState<JobApplication | null>(null);
+    const [editForm, setEditForm] = useState({ title: '', status: '', salary: '', location: '', notes: '' });
+    const [isSaving, setIsSaving] = useState(false);
+
+    const handleEditClick = (app: JobApplication, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setEditingJob(app);
+        setEditForm({
+            title: app.jobTitle,
+            status: app.status,
+            salary: app.salary || '',
+            location: app.location || 'Unknown',
+            notes: app.notes || ''
+        });
+        setIsEditModalOpen(true);
+    };
+
+    const handleDeleteClick = async (id: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!window.confirm('Are you sure you want to delete this application? This cannot be undone.')) return;
+        
+        try {
+            await deleteJob(id);
+            setJobs(prev => prev ? prev.filter(j => j.id !== id) : null);
+        } catch (err) {
+            console.error('Failed to delete job', err);
+            alert('Failed to delete application. Please try again.');
+        }
+    };
+
+    const handleSaveEdit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editingJob) return;
+        
+        setIsSaving(true);
+        try {
+            await updateJob(editingJob.id, {
+                jobTitle: editForm.title,
+                status: editForm.status,
+                salary: editForm.salary,
+                location: editForm.location,
+                notes: editForm.notes
+            });
+            
+            setJobs(prev => prev ? prev.map(j => j.id === editingJob.id ? {
+                ...j,
+                jobTitle: editForm.title,
+                status: editForm.status as any,
+                salary: editForm.salary,
+                location: editForm.location,
+                notes: editForm.notes,
+                updated: new Date().toISOString()
+            } : j) : null);
+            
+            setIsEditModalOpen(false);
+            setEditingJob(null);
+        } catch (err) {
+            console.error('Failed to update job', err);
+            alert('Failed to update application. Please try again.');
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -29,7 +99,9 @@ export default function DashboardPage() {
     }, [location.search, refreshUser, navigate]);
 
     useEffect(() => {
-        getJobs()
+        localStorage.setItem('trackyjobby_category', activeCategory);
+        setLoading(true);
+        getJobs(activeCategory)
             .then((res) => {
                 setJobs(res.jobs || []);
             })
@@ -40,18 +112,114 @@ export default function DashboardPage() {
             .finally(() => {
                 setLoading(false);
             });
-    }, []);
+    }, [activeCategory]);
 
     // Derived State Check
     const filteredJobs = jobs?.filter(j =>
         statusFilter === 'All status' || j.status === statusFilter
     ) || [];
 
+    const bookmarkedApps = filteredJobs.filter(j => j.status === 'Bookmarked');
     const activeApps = filteredJobs.filter(j => ['Applied', 'Interview', 'Offer'].includes(j.status));
     const acceptedApps = filteredJobs.filter(j => j.status === 'Accepted');
     const closedApps = filteredJobs.filter(j => j.status === 'Rejected');
     const totalCount = jobs?.length || 0;
     const interviewsCount = jobs?.filter(j => j.status === 'Interview').length || 0;
+
+    const renderJobCard = (app: JobApplication) => (
+        <div key={app.id} className="job-card clickable" onClick={() => { setSelectedJob(app); setIsModalOpen(true); }}>
+            <div className="job-card-header flex-between" style={{ alignItems: 'flex-start', gap: '1rem' }}>
+                <div className="flex-center gap-3" style={{ flex: 1, minWidth: 0 }}>
+                    <div className="company-logo" style={{ flexShrink: 0, overflow: 'hidden', backgroundColor: 'var(--card-bg)' }}>
+                        <img
+                            src={app.logo || (app.domain ? `https://cdn.brandfetch.io/${app.domain}?c=1idpPzZ5e4dgNRWVKYA` : '')}
+                            alt={`${app.company} Logo`}
+                            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                            onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                if (target.parentElement) {
+                                    target.parentElement.innerHTML = app.company.charAt(0).toUpperCase();
+                                    target.parentElement.style.backgroundColor = 'var(--bg-color)';
+                                }
+                            }}
+                        />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+                        <h4 style={{ 
+                            color: app.company === 'Processing...' ? 'var(--accent-color)' : 'var(--text-secondary)', 
+                            fontSize: '0.8125rem', 
+                            fontWeight: 400, 
+                            marginBottom: '0.125rem', 
+                            whiteSpace: 'nowrap', 
+                            overflow: 'hidden', 
+                            textOverflow: 'ellipsis',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                        }}>
+                            {app.company}
+                            {app.company === 'Processing...' && (
+                                <span className="pulse-dot" style={{ 
+                                    width: '6px', 
+                                    height: '6px', 
+                                    borderRadius: '50%', 
+                                    backgroundColor: 'var(--accent-color)',
+                                    display: 'inline-block'
+                                }}></span>
+                            )}
+                        </h4>
+                        <h3 style={{ fontSize: '1.05rem', fontWeight: 600, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{app.jobTitle}</h3>
+                    </div>
+                </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem', flexShrink: 0 }}>
+                        <div style={{ display: 'flex', gap: '0.4rem' }}>
+                            {app.sourceUrl && (
+                                <a 
+                                    href={app.sourceUrl} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="icon-action-btn"
+                                    onClick={e => e.stopPropagation()}
+                                    title="Visit Original Link"
+                                    style={{ color: 'var(--primary-color)' }}
+                                >
+                                    <ExternalLink size={14} />
+                                </a>
+                            )}
+                            <span className={`status-badge ${app.status === 'Interview' ? 'status-interview' : app.status === 'Bookmarked' ? 'status-applied' : 'status-applied'}`}>
+                                <Calendar size={12} />
+                                {app.status}
+                            </span>
+                        </div>
+                        <div className="job-card-actions" onClick={e => e.stopPropagation()}>
+                        <button className="icon-action-btn" onClick={(e) => handleEditClick(app, e)} title="Edit"><Edit2 size={14} /></button>
+                        <button className="icon-action-btn delete" onClick={(e) => handleDeleteClick(app.id, e)} title="Delete"><Trash2 size={14} /></button>
+                    </div>
+                </div>
+            </div>
+
+            <div className="job-details-grid">
+                <div className="detail-item">
+                    <MapPin size={14} />
+                    <span>{app.location || 'Unknown'}</span>
+                </div>
+                <div className="detail-item">
+                    <DollarSign size={14} />
+                    <span>{app.salary || 'Unknown'}</span>
+                </div>
+                <div className="detail-item text-muted">
+                    <span>Applied: {new Date(app.appliedDate).toLocaleDateString()}</span>
+                </div>
+            </div>
+
+
+
+            <div className="job-card-footer">
+                <span className="text-muted">Updated {new Date(app.updated).toLocaleDateString()}</span>
+            </div>
+        </div>
+    );
     return (
         <div className="dashboard-container animate-fade-in">
             <TrialBanner />
@@ -88,12 +256,46 @@ export default function DashboardPage() {
             )}
 
             {/* Header */}
-            <header className="dashboard-header flex-between">
+            <header className="dashboard-header" style={{ marginBottom: '1.5rem', borderBottom: 'none', paddingBottom: '0' }}>
                 <div>
-                    <h1>Job Applications</h1>
-                    <p>Track and manage your job applications for this season</p>
+                    <h1>{CATEGORIES[activeCategory].label}</h1>
+                    <p>Track and manage your {CATEGORIES[activeCategory].label.toLowerCase()}</p>
                 </div>
             </header>
+
+            {/* Category Tab Bar */}
+            <div className="category-tabs no-scrollbar" style={{ display: 'flex', gap: '1rem', marginBottom: '2.5rem', borderBottom: '1px solid var(--border-color)', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                {(Object.entries(CATEGORIES) as [CategoryId, typeof CATEGORIES[keyof typeof CATEGORIES]][])
+                    .filter(([id]) => (user?.enabledCategories || ['job']).includes(id))
+                    .map(([id, cat]) => {
+                    const Icon = id === 'job' ? Briefcase : id === 'housing' ? Home : id === 'school' ? GraduationCap : Award;
+                    const isActive = activeCategory === id;
+                    return (
+                        <button
+                            key={id}
+                            onClick={() => { setActiveCategory(id); setStatusFilter('All status'); }}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                padding: '0.75rem 1rem',
+                                background: 'transparent',
+                                border: 'none',
+                                borderBottom: isActive ? '2px solid var(--primary-color)' : '2px solid transparent',
+                                color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+                                fontWeight: isActive ? 500 : 400,
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                                fontSize: '0.95rem',
+                                whiteSpace: 'nowrap'
+                            }}
+                        >
+                            <Icon size={18} />
+                            {cat.label}
+                        </button>
+                    )
+                })}
+            </div>
 
             {/* Metrics Section */}
             <section className="metrics-grid">
@@ -142,15 +344,30 @@ export default function DashboardPage() {
                             onChange={(e) => setStatusFilter(e.target.value)}
                         >
                             <option value="All status">All status</option>
-                            <option value="Applied">Applied</option>
-                            <option value="Interview">Interview</option>
-                            <option value="Offer">Offer</option>
-                            <option value="Accepted">Accepted</option>
-                            <option value="Rejected">Rejected</option>
+                            {CATEGORIES[activeCategory].statuses.map(s => (
+                                <option key={s} value={s}>{s}</option>
+                            ))}
                         </select>
                         <ChevronDown size={14} className="filter-chevron" />
                     </div>
                 </section>
+
+                {/* Bookmarked Apps */}
+                {(statusFilter === 'All status' || statusFilter === 'Bookmarked') && bookmarkedApps.length > 0 && (
+                    <section className="app-section">
+                        <div className="section-header flex-between">
+                            <div>
+                                <h3>Bookmarked / Saved</h3>
+                                <p>Saved listings you haven't applied to yet</p>
+                            </div>
+                            <span className="badge badge-muted">{bookmarkedApps.length} saved</span>
+                        </div>
+
+                        <div className="apps-grid scrollable-grid animate-fade-in">
+                            {bookmarkedApps.map(renderJobCard)}
+                        </div>
+                    </section>
+                )}
 
                 {/* Active Apps */}
                 {(statusFilter === 'All status' || statusFilter === 'Applied' || statusFilter === 'Interview' || statusFilter === 'Offer') && (
@@ -174,56 +391,8 @@ export default function DashboardPage() {
                                 <p className="text-muted text-sm">Forward job applications to your TrackyJobby email address and they will magically appear here.</p>
                             </div>
                         ) : (
-                            <div className="apps-grid animate-fade-in">
-                                {activeApps.map(app => (
-                                    <div key={app.id} className="job-card clickable" onClick={() => { setSelectedJob(app); setIsModalOpen(true); }}>
-                                        <div className="job-card-header flex-between">
-                                            <div className="flex-center gap-3">
-                                                <div className="company-logo" style={{ overflow: 'hidden', backgroundColor: 'var(--card-bg)' }}>
-                                                    <img
-                                                        src={app.logo || (app.domain ? `https://cdn.brandfetch.io/${app.domain}?c=1idpPzZ5e4dgNRWVKYA` : '')}
-                                                        alt={`${app.company} Logo`}
-                                                        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                                                        onError={(e) => {
-                                                            const target = e.target as HTMLImageElement;
-                                                            target.style.display = 'none';
-                                                            if (target.parentElement) {
-                                                                target.parentElement.innerHTML = app.company.charAt(0).toUpperCase();
-                                                                target.parentElement.style.backgroundColor = 'var(--bg-color)';
-                                                            }
-                                                        }}
-                                                    />
-                                                </div>
-                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                    <h4 style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem', fontWeight: 400, marginBottom: '0.125rem' }}>{app.company}</h4>
-                                                    <h3 style={{ fontSize: '1.05rem', fontWeight: 600 }}>{app.jobTitle}</h3>
-                                                </div>
-                                            </div>
-                                            <span className={`status-badge ${app.status === 'Interview' ? 'status-interview' : 'status-applied'}`}>
-                                                <Calendar size={12} />
-                                                {app.status}
-                                            </span>
-                                        </div>
-
-                                        <div className="job-details-grid">
-                                            <div className="detail-item">
-                                                <MapPin size={14} />
-                                                <span>{app.location || 'Unknown'}</span>
-                                            </div>
-                                            <div className="detail-item">
-                                                <DollarSign size={14} />
-                                                <span>{app.salary || 'Unknown'}</span>
-                                            </div>
-                                            <div className="detail-item text-muted">
-                                                <span>Applied: {new Date(app.appliedDate).toLocaleDateString()}</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="job-card-footer">
-                                            <span className="text-muted">Updated {new Date(app.updated).toLocaleDateString()}</span>
-                                        </div>
-                                    </div>
-                                ))}
+                            <div className="apps-grid scrollable-grid animate-fade-in">
+                                {activeApps.map(renderJobCard)}
                             </div>
                         )}
                     </section>
@@ -271,27 +440,33 @@ export default function DashboardPage() {
                                 <p className="text-muted text-sm">Rejected applications will appear here</p>
                             </div>
                         ) : (
-                            <div className="apps-grid animate-fade-in" style={{ marginBottom: '1.5rem' }}>
+                            <div className="apps-grid scrollable-grid animate-fade-in" style={{ marginBottom: '1.5rem' }}>
                                 {closedApps.map(app => (
                                     <div key={app.id} className="job-card clickable shadow-sm" style={{ opacity: 0.8 }} onClick={() => { setSelectedJob(app); setIsModalOpen(true); }}>
-                                        <div className="job-card-header flex-between">
-                                            <div className="flex-center gap-3">
-                                                <div className="company-logo" style={{ overflow: 'hidden', backgroundColor: 'var(--card-bg)' }}>
+                                        <div className="job-card-header flex-between" style={{ alignItems: 'flex-start', gap: '1rem' }}>
+                                            <div className="flex-center gap-3" style={{ flex: 1, minWidth: 0 }}>
+                                                <div className="company-logo" style={{ flexShrink: 0, overflow: 'hidden', backgroundColor: 'var(--card-bg)' }}>
                                                     <img
                                                         src={app.logo || (app.domain ? `https://cdn.brandfetch.io/${app.domain}?c=1idpPzZ5e4dgNRWVKYA` : '')}
                                                         alt={`${app.company} Logo`}
                                                         style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                                                     />
                                                 </div>
-                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                    <h4 style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem', fontWeight: 400, marginBottom: '0.125rem' }}>{app.company}</h4>
-                                                    <h3 style={{ fontSize: '1.05rem', fontWeight: 600 }}>{app.jobTitle}</h3>
+                                                <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+                                                    <h4 style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem', fontWeight: 400, marginBottom: '0.125rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{app.company}</h4>
+                                                    <h3 style={{ fontSize: '1.05rem', fontWeight: 600, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{app.jobTitle}</h3>
                                                 </div>
                                             </div>
-                                            <span className="status-badge status-rejected">
-                                                <Trash2 size={12} />
-                                                {app.status}
-                                            </span>
+                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem', flexShrink: 0 }}>
+                                                <span className="status-badge status-rejected">
+                                                    <Trash2 size={12} />
+                                                    {app.status}
+                                                </span>
+                                                <div className="job-card-actions" onClick={e => e.stopPropagation()}>
+                                                    <button className="icon-action-btn" onClick={(e) => handleEditClick(app, e)} title="Edit"><Edit2 size={14} /></button>
+                                                    <button className="icon-action-btn delete" onClick={(e) => handleDeleteClick(app.id, e)} title="Delete"><Trash2 size={14} /></button>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div className="job-card-footer">
                                             <span className="text-muted">Applied: {new Date(app.appliedDate).toLocaleDateString()}</span>
@@ -322,7 +497,20 @@ export default function DashboardPage() {
                                 </div>
                                 <div>
                                     <h2>{selectedJob.jobTitle}</h2>
-                                    <p className="modal-company-name">{selectedJob.company}</p>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <p className="modal-company-name">{selectedJob.company}</p>
+                                        {selectedJob.sourceUrl && (
+                                            <a 
+                                                href={selectedJob.sourceUrl} 
+                                                target="_blank" 
+                                                rel="noopener noreferrer"
+                                                className="text-primary hover-underline flex-center gap-1"
+                                                style={{ fontSize: '0.8125rem', color: 'var(--primary-color)' }}
+                                            >
+                                                Visit Listing <ExternalLink size={12} />
+                                            </a>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                             <span className={`status-badge big-badge status-${selectedJob.status.toLowerCase()}`}>
@@ -362,6 +550,13 @@ export default function DashboardPage() {
                                 </div>
                             </div>
 
+                            {selectedJob.notes && (
+                                <div className="modal-notes" style={{ marginTop: '1.5rem', padding: '1rem', background: 'var(--bg-color)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                                    <h3 style={{ fontSize: '0.875rem', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Job Description / Notes</h3>
+                                    <p style={{ fontSize: '0.9375rem', lineHeight: '1.6', color: 'var(--text-primary)', whiteSpace: 'pre-wrap' }}>{selectedJob.notes}</p>
+                                </div>
+                            )}
+
                             <div className="modal-journey">
                                 <h3>Application Journey</h3>
                                 <div className="journey-timeline">
@@ -398,8 +593,91 @@ export default function DashboardPage() {
                         </div>
 
                         <div className="modal-footer">
-                            <button className="secondary-btn" onClick={() => setIsModalOpen(false)}>Cancel</button>
+                            <button className="secondary-btn" onClick={() => setIsModalOpen(false)}>Close</button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit Job Modal */}
+            {isEditModalOpen && editingJob && (
+                <div className="modal-overlay" onClick={() => setIsEditModalOpen(false)}>
+                    <div className="modal-content edit-modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+                        <button className="modal-close" onClick={() => setIsEditModalOpen(false)}>
+                            <X size={20} />
+                        </button>
+                        <div className="modal-header" style={{ marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
+                            <h2 style={{ fontSize: '1.25rem' }}>Edit Application</h2>
+                        </div>
+                        <form onSubmit={handleSaveEdit} className="edit-job-form">
+                            <div className="form-group" style={{ marginBottom: '1rem' }}>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{CATEGORIES[activeCategory].fields.title}</label>
+                                <input 
+                                    className="fancy-input"
+                                    type="text" 
+                                    value={editForm.title} 
+                                    onChange={e => setEditForm({...editForm, title: e.target.value})} 
+                                    required 
+                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--app-bg)', color: '#fff' }}
+                                />
+                            </div>
+                            <div className="form-group" style={{ marginBottom: '1rem' }}>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Status</label>
+                                <select 
+                                    className="fancy-input"
+                                    value={editForm.status} 
+                                    onChange={e => setEditForm({...editForm, status: e.target.value})}
+                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--app-bg)', color: '#fff' }}
+                                >
+                                    {CATEGORIES[activeCategory].statuses.map(s => (
+                                        <option key={s} value={s}>{s}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="form-group-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                <div className="form-group">
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Salary Range</label>
+                                    <input 
+                                        className="fancy-input"
+                                        type="text" 
+                                        value={editForm.salary} 
+                                        onChange={e => setEditForm({...editForm, salary: e.target.value})} 
+                                        placeholder="e.g. $100k - $120k"
+                                        style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--app-bg)', color: '#fff' }}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Location / Type</label>
+                                    <select 
+                                        className="fancy-input"
+                                        value={editForm.location} 
+                                        onChange={e => setEditForm({...editForm, location: e.target.value})}
+                                        style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--app-bg)', color: '#fff' }}
+                                    >
+                                        <option value="Remote">Remote</option>
+                                        <option value="On-site">On-site</option>
+                                        <option value="Hybrid">Hybrid</option>
+                                        <option value="Unknown">Unknown</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="form-group" style={{ marginBottom: '1rem' }}>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Job Description / Notes</label>
+                                <textarea 
+                                    className="fancy-input"
+                                    value={editForm.notes || ''} 
+                                    onChange={e => setEditForm({...editForm, notes: e.target.value})} 
+                                    placeholder="Paste job description or add notes here..."
+                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--app-bg)', color: '#fff', minHeight: '120px', resize: 'vertical' }}
+                                />
+                            </div>
+                            <div className="modal-footer" style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                                <button type="button" className="secondary-btn" onClick={() => setIsEditModalOpen(false)}>Cancel</button>
+                                <button type="submit" className="primary-btn" disabled={isSaving}>
+                                    {isSaving ? 'Saving...' : 'Save Changes'}
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}

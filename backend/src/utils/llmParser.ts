@@ -13,13 +13,16 @@ export interface InterviewData {
 }
 
 export interface JobData {
+    category?: 'job' | 'housing' | 'school' | 'scholarship';
     companyName: string;
     companyDomain: string | null;
     jobTitle: string;
-    status: 'Applied' | 'Interview' | 'Offer' | 'Accepted' | 'Rejected';
+    status: string;
     salaryRange: string | null;
     locationType: 'Remote' | 'On-site' | 'Hybrid' | 'Unknown';
     interviews: InterviewData[];
+    sourceUrl?: string;
+    notes: string | null;
 }
 
 export interface ParserResult {
@@ -33,37 +36,36 @@ export async function parseJobEmail(
 ): Promise<ParserResult> {
     try {
         const prompt = `
-You are an AI assistant for a job application tracking system called "TrackyJobby".
-Your job is to read an incoming email and determine if it is related to a SPECIFIC personal job application progress. 
-A "Job Application" email is strictly one of:
-- Application Confirmation ("Thank you for applying to [Role]")
-- Interview Invite ("We'd like to interview you for [Role]")
-- Job Offer ("We are excited to offer you the position of [Role]")
-- Rejection ("We won't be moving forward with your application for [Role]")
+You are an AI assistant for an application tracking system called "TrackyJobby".
+Your job is to read an incoming email and determine if it is related to a SPECIFIC personal application progress for jobs, housing, schools, or scholarships. 
+An "Application" email is strictly one of:
+- Application Confirmation ("Thank you for applying to [Role/Listing]")
+- Interview / Viewing Invite ("We'd like to interview you / schedule a viewing for [Role/Listing]")
+- Offer / Acceptance
+- Rejection
 
-CRITICAL: General "Job Alerts", "Job Recommendations", "Daily Matches", or marketing newsletters are NOT job applications. If the email contains a list of multiple jobs or says "New jobs for you at [Company]", set "isJobRelated" to false.
+CRITICAL: General "Job Alerts", "Daily Matches", or newsletters are NOT personal applications.
 
 Evaluate the following email (Current Date: ${new Date().toISOString()}):
 Subject: ${subject}
 Body: ${bodyText}
 
-1. If this email is NOT a specific personal application update, set "isJobRelated" to false and return null for "jobData".
-3. If this email IS a job application, set "isJobRelated" to true and extract the following information as structured JSON in the "jobData" field:
-   - "companyName": The name of the ACTUAL hiring company, NOT the job board or meeting platform. 
-     - CRITICAL: If the email is a meeting confirmation from Cal.com, Calendly, Google Meet, or Zoom, the company is NOT "Cal.com" or "Google". Look for the host's name or the company name mentioned in the "Meeting with..." or "Interview with..." section.
-     - Look for the real company name in the footer or the organizer's organization name.
-   - "companyDomain": The primary website domain of the ACTUAL hiring company (e.g., 'vertex.com'). 
-     - CRITICAL: If the email is from a third-party tool (Indeed, LinkedIn, Cal.com), look for an email address in the body like 'founder@company.com' and extract 'company.com'. If you see a link like 'https://cal.com/richard-nexagen', the company is likely 'Nexagen'.
-   - "jobTitle": The role or position applied for. Look extremely carefully in the Subject line and the first few paragraphs of the body. It is often near keywords like "Position:", "Role:", "Application for", or "[Company] - [Role]". If the subject is "Interview with Langdock", and the body says "our Frontend role", the title is "Frontend Developer". DO NOT use "Unknown" if you can find any indication of the role.
-   - "status": The current status of the application based on the email context. MUST be exactly one of these strings: "Applied", "Interview", "Offer", "Accepted", "Rejected". Defaults to "Applied" if it's just a confirmation.
-   - "salaryRange": Any salary or compensation mentioned (e.g., "$100k-$120k", "£50k"). Null if not mentioned.
-   - "locationType": MUST be exactly one of: "Remote", "On-site", "Hybrid", "Unknown". Try to infer from the text. If not stated, use "Unknown".
-   - "interviews": An array of any interview rounds scheduled in the email. Each object MUST have "interviewType" (e.g., "Technical Round", "Founder Chat"). Avoid generic titles like "On" or "Click here". For "interviewDate", use the provided Current Date context to resolve relative dates (e.g., "next Tuesday", "tomorrow at 3pm") into a full ISO string. CRITICAL: Interviews are almost always in the FUTURE. If a date like "Dec 8" is mentioned and today is Feb 28, 2026, you MUST assume the date is Dec 8, 2026, UNLESS the email explicitly describes a past event. Include "durationMinutes" (integer or null), and "meetingLink" (string or null).
+1. If this email is NOT a specific personal application update, set "isJobRelated" to false and return null.
+3. If this email IS an application, set "isJobRelated" to true and extract the following:
+   - "category": MUST be exactly one of: "job", "housing", "school", "scholarship". Default to "job".
+   - "companyName": The name of the hiring company, university, or landlord. Look for the real entity name.
+   - "companyDomain": The primary website domain of the entity.
+   - "jobTitle": The role, property listing, or programme applied for.
+   - "status": The current status based on the email. MUST be exactly one of: "Bookmarked", "Applied", "Interview", "Offer", "Accepted", "Rejected", "Waitlisted", "Viewing", "Awarded". Defaults to "Applied" if it's just a confirmation.
+   - "salaryRange": Any salary, compensation, or price mentioned. Null if not mentioned.
+   - "locationType": MUST be exactly one of: "Remote", "On-site", "Hybrid", "Unknown". Try to infer from the text. Use "Unknown" if not stated.
+   - "notes": A brief summary of the job description, key requirements, or any important details found in the email.
+   - "interviews": An array of any interview rounds or viewings scheduled in the email. Each MUST have "interviewType". For "interviewDate", resolve relative dates into a full ISO string (assume futures dates).
 
 Respond ONLY with raw JSON in the following format, with no markdown code blocks:
 {
   "isJobRelated": true|false,
-  "jobData": { "companyName": "...", "companyDomain": "...", "jobTitle": "...", "status": "...", "salaryRange": "...", "locationType": "...", "interviews": [] }
+  "jobData": { "category": "...", "companyName": "...", "companyDomain": "...", "jobTitle": "...", "status": "...", "salaryRange": "...", "locationType": "...", "notes": "...", "interviews": [] }
 }
 `;
 
@@ -85,5 +87,47 @@ Respond ONLY with raw JSON in the following format, with no markdown code blocks
     } catch (err) {
         console.error('LLM Parser error:', err);
         return { isJobRelated: false, jobData: null };
+    }
+}
+
+export async function parsePageContent(pageText: string, url: string, domain: string): Promise<JobData | null> {
+    try {
+        const prompt = `
+You are an AI assistant for TrackyJobby. Your job is to extract structured application details from raw web page text.
+
+Evaluate the following web page content:
+URL: ${url}
+Domain: ${domain}
+Text: ${pageText.substring(0, 3000)}
+
+Extract the following information as structured JSON:
+- "category": The type of listing. MUST be exactly one of: "job", "housing", "school", "scholarship". Default to "job".
+- "companyName": The name of the hiring company, university, or landlord. Do NOT simply use the job board site name (like LinkedIn) unless the job is actually AT LinkedIn.
+- "companyDomain": The primary official website domain of the hiring company (e.g. 'acme.com', 'contabo.com'). **CRITICAL: NEVER return a job board domain like 'linkedin.com', 'glassdoor.com', 'indeed.com', 'workday.com', 'lever.co' or 'smartrecruiters.com' unless the role is literally working AT that company.** If you can only see the job board URL, ignore it and return null for this field. Always prioritize the actual company's official website.
+- "jobTitle": The role, property listing, or programme name.
+- "status": MUST be exactly "Bookmarked".
+- "salaryRange": Any salary, price, or compensation mentioned. Null if not mentioned.
+- "locationType": MUST be exactly one of: "Remote", "On-site", "Hybrid", "Unknown". Try to infer from the text. Use "Unknown" if not stated.
+- "notes": A concise summary of the job description, role responsibilities, or listing details extracted from the page text.
+
+**CRITICAL: If the provided text does NOT contain any substantive details of a specific job, house, or educational listing (e.g. it's just a notifications feed, a search results page with 20 items, or a generic home page), return null for the entire JSON object.** Otherwise, return:
+{ "category": "...", "companyName": "...", "companyDomain": "...", "jobTitle": "...", "status": "Bookmarked", "salaryRange": "...", "locationType": "...", "notes": "...", "interviews": [] }
+`;
+
+        console.log(`🤖 Sending prompt to LLM (${domain}). Text length: ${pageText.length}`);
+        // console.log("DEBUG PROMPT:", prompt); // Uncomment only for deep debugging
+        const response = await openai.chat.completions.create({
+            model: 'deepseek-chat',
+            messages: [{ role: 'user', content: prompt }],
+            temperature: 0,
+            response_format: { type: 'json_object' }
+        });
+
+        const content = response.choices[0]?.message?.content || '{}';
+        console.log('🤖 LLM Raw Page Parser Response:', content);
+        return JSON.parse(content) as JobData;
+    } catch (err) {
+        console.error('LLM Page Parser error:', err);
+        return null;
     }
 }

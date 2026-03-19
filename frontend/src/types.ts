@@ -6,6 +6,8 @@ export interface User {
     forwardingEmail: string | null;
     email_verified: boolean;
     subscription_status: 'none' | 'trialing' | 'active' | 'canceled' | 'lifetime';
+    enabledCategories: string[];
+    defaultCategory: string;
     created_at: string;
 }
 

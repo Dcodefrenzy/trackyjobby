@@ -35,16 +35,16 @@ export default function LandingPage() {
                 <div className="hero-content">
                     <div className="badge-glow animate-fade-in">Now in Beta — v1.0</div>
                     <h1 className="hero-title animate-fade-in">
-                        Job hunting is messy.<br />
-                        <span>TrackyJobby</span> tracks your jobs application automatically.
+                        Applications are messy.<br />
+                        <span>TrackyJobby</span> tracks your jobs, apartments, and schools automatically.
                     </h1>
                     <p className="hero-subtitle animate-fade-in" style={{ maxWidth: '800px' }}>
-                        TrackyJobby was created to help job seekers manage and track their applications in one simple place.
-                        Instead of juggling scattered notes, inbox searches, or clunky spreadsheets, TrackyJobby automatically
-                        organizes your applications and keeps everything up to date.
+                        TrackyJobby was created to help you manage and track all your applications in one simple place.
+                        Whether it's for a new job, an apartment, a university program, or a scholarship, TrackyJobby automatically
+                        organizes your progress and keeps everything up to date.
                     </p>
                     <p className="hero-subtitle animate-fade-in" style={{ marginTop: '-1.5rem', fontWeight: 500, color: 'var(--text-primary)' }}>
-                        Focus on landing the job — TrackyJobby handles the tracking.
+                        Focus on landing the opportunity — TrackyJobby handles the tracking.
                     </p>
                     <div className="hero-actions animate-fade-in">
                         <Link to="/auth/register" className="btn-primary">
@@ -141,7 +141,7 @@ export default function LandingPage() {
                             <ShieldCheck size={24} className="text-primary" />
                         </div>
                         <h3>Privacy First</h3>
-                        <p>Your data is encrypted and secure. We track your job hunt, not your life.</p>
+                        <p>Your data is encrypted and secure. We track your journey, not your life.</p>
                     </div>
                 </div>
             </section>
@@ -150,7 +150,7 @@ export default function LandingPage() {
             <section className="pricing-section">
                 <div className="section-intro">
                     <h2 className="section-title">Simple, transparent pricing</h2>
-                    <p className="section-subtitle">Choose the plan that's right for your job hunt.</p>
+                    <p className="section-subtitle">Choose the plan that's right for your goals.</p>
                 </div>
 
                 <div className="pricing-grid">
@@ -195,7 +195,7 @@ export default function LandingPage() {
             <section className="cta-section">
                 <div className="cta-card glass">
                     <h2>Ready to land that offer?</h2>
-                    <p>Join hundreds of developers managing their career growth with TrackyJobby.</p>
+                    <p>Join hundreds of people managing their applications seamlessly with TrackyJobby.</p>
                     <Link to="/auth/register" className="btn-primary">
                         Start Tracking
                     </Link>

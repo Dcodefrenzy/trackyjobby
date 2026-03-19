@@ -149,7 +149,11 @@
 }
 
 .alias-card {
-    grid-column: span 12;
+    grid-column: span 6;
+}
+
+.categories-card {
+    grid-column: span 6;
 }
 
 .instructions-card {
@@ -326,7 +330,8 @@
 
     .profile-info-card,
     .subscription-card,
-    .alias-card {
+    .alias-card,
+    .categories-card {
         grid-column: span 12;
     }
 }

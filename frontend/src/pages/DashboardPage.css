@@ -233,6 +233,25 @@
     gap: 1rem;
 }
 
+.scrollable-grid {
+    max-height: 50vh;
+    overflow-y: auto;
+    padding-right: 8px; /* For scrollbar */
+    padding-bottom: 1rem;
+}
+
+/* Custom scrollbar for scrollable grids */
+.scrollable-grid::-webkit-scrollbar {
+    width: 6px;
+}
+.scrollable-grid::-webkit-scrollbar-track {
+    background: transparent;
+}
+.scrollable-grid::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 10px;
+}
+
 .job-card {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
@@ -361,6 +380,40 @@
 .job-card.clickable:hover {
     border-color: var(--primary-color);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.job-card-actions {
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.job-card:hover .job-card-actions {
+    opacity: 1;
+}
+
+.icon-action-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 0.35rem;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.icon-action-btn:hover {
+    background: var(--card-hover);
+    color: var(--text-primary);
+}
+
+.icon-action-btn.delete:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger-color);
 }
 
 /* Modal Styles */

@@ -162,7 +162,9 @@ router.post('/login', async (req: Request, res: Response) => {
             email: user.email,
             name: user.name,
             mailForwarder: user.mail_forwarder,
-            subscription_status: user.subscription_status
+            subscription_status: user.subscription_status,
+            enabledCategories: user.enabled_categories || ['job'],
+            defaultCategory: user.default_category || 'job',
         },
     });
 });
@@ -178,7 +180,7 @@ router.get('/me', async (req: Request, res: Response) => {
         const payload = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
         const { data: user } = await supabase
             .from('users')
-            .select('id, email, name, mail_forwarder, email_verified, created_at, subscription_status')
+            .select('id, email, name, mail_forwarder, email_verified, created_at, subscription_status, enabled_categories, default_category')
             .eq('id', payload.userId)
             .single();
 
@@ -187,9 +189,43 @@ router.get('/me', async (req: Request, res: Response) => {
         return res.json({
             ...user,
             forwardingEmail: user.mail_forwarder ? forwardingEmail(user.mail_forwarder) : null,
+            enabledCategories: user.enabled_categories || ['job'],
+            defaultCategory: user.default_category || 'job',
         });
     } catch {
         return res.status(401).json({ error: 'Invalid token' });
+    }
+});
+
+// ─── Update Categories ────────────────────────────────────────────────────────
+router.put('/me/categories', async (req: Request, res: Response) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    try {
+        const token = authHeader.split(' ')[1];
+        const payload = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
+        const { enabledCategories, defaultCategory } = req.body;
+
+        if (!enabledCategories || !Array.isArray(enabledCategories)) {
+            return res.status(400).json({ error: 'enabledCategories must be an array' });
+        }
+
+        const { error } = await supabase
+            .from('users')
+            .update({
+                enabled_categories: enabledCategories,
+                default_category: defaultCategory || 'job'
+            })
+            .eq('id', payload.userId);
+
+        if (error) throw error;
+
+        return res.json({ success: true });
+    } catch (err) {
+        console.error('Error updating categories:', err);
+        return res.status(500).json({ error: 'Failed to update categories' });
     }
 });
 

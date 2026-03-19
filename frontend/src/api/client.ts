@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 const api = axios.create({ baseURL: BASE });
 
@@ -23,6 +23,9 @@ export const verifyEmail = (token: string) =>
 export const setupForwarder = (mailForwarder: string) =>
     api.post('/api/auth/setup-forwarder', { mailForwarder }).then((r) => r.data);
 
+export const updateCategories = (enabledCategories: string[], defaultCategory?: string) =>
+    api.put('/api/auth/me/categories', { enabledCategories, defaultCategory }).then((r) => r.data);
+
 export const getMe = () => api.get('/api/auth/me').then((r) => r.data);
 
 export const getForwardingVerification = (): Promise<{ verificationUrl: string }> =>
@@ -40,20 +43,23 @@ export interface JobEvent {
 
 export interface JobApplication {
     id: string;
+    category?: string;
     jobTitle: string;
     company: string;
     domain: string;
     logo: string | null;
-    status: 'Applied' | 'Interview' | 'Offer' | 'Accepted' | 'Rejected';
+    status: string;
     salary: string | null;
     location: string;
     appliedDate: string;
     updated: string;
+    sourceUrl?: string;
+    notes?: string;
     events: JobEvent[];
 }
 
-export const getJobs = (): Promise<{ jobs: JobApplication[] }> =>
-    api.get('/api/jobs').then((r) => r.data);
+export const getJobs = (category: string = 'job'): Promise<{ jobs: JobApplication[] }> =>
+    api.get(`/api/jobs?category=${category}`).then((r) => r.data);
 
 export interface JobInterview {
     id: string;
@@ -65,8 +71,17 @@ export interface JobInterview {
     companyName: string;
 }
 
-export const getInterviews = (): Promise<{ interviews: JobInterview[] }> =>
-    api.get('/api/jobs/interviews').then((r) => r.data);
+export const getInterviews = (category: string = 'job'): Promise<{ interviews: JobInterview[] }> =>
+    api.get(`/api/jobs/interviews?category=${category}`).then((r) => r.data);
+
+export const updateJob = (id: string, data: Partial<JobApplication>) =>
+    api.put(`/api/jobs/${id}`, data).then((r) => r.data);
+
+export const deleteJob = (id: string) =>
+    api.delete(`/api/jobs/${id}`).then((r) => r.data);
+
+export const deleteInterview = (id: string) =>
+    api.delete(`/api/jobs/interviews/${id}`).then((r) => r.data);
 
 export const submitFeedback = (category: string, message: string) =>
     api.post('/api/feedback', { category, message }).then((r) => r.data);

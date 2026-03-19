@@ -1,20 +1,48 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { User, Mail, LogOut, Copy, ExternalLink, ShieldCheck, MailWarning, ArrowLeft, CreditCard, Loader2, Settings } from 'lucide-react';
-import { createPortalSession } from '../api/client';
+import { User, Mail, LogOut, Copy, ExternalLink, ShieldCheck, MailWarning, ArrowLeft, CreditCard, Loader2, Settings, Layers, Briefcase, Home, GraduationCap, Award } from 'lucide-react';
+import { createPortalSession, updateCategories } from '../api/client';
+import { CATEGORIES, type CategoryId } from '../config/categories';
 import './ProfilePage.css';
 
 export default function ProfilePage() {
-    const { user, logout } = useAuth();
+    const { user, logout, refreshUser } = useAuth();
     const navigate = useNavigate();
     const [isPortalLoading, setIsPortalLoading] = useState(false);
+    const [isSavingCategories, setIsSavingCategories] = useState(false);
 
     // No logic needed here for portal return as it now redirects to dashboard
 
     const handleLogout = () => {
         logout();
         navigate('/auth/login');
+    };
+
+    const handleToggleCategory = async (categoryId: CategoryId) => {
+        if (!user) return;
+        
+        let newCategories = [...user.enabledCategories];
+        if (newCategories.includes(categoryId)) {
+            newCategories = newCategories.filter(id => id !== categoryId);
+            if (newCategories.length === 0) {
+                alert("You must have at least one category enabled!");
+                return;
+            }
+        } else {
+            newCategories.push(categoryId);
+        }
+
+        try {
+            setIsSavingCategories(true);
+            await updateCategories(newCategories, user.defaultCategory);
+            await refreshUser();
+        } catch (err) {
+            console.error("Failed to update categories:", err);
+            alert("Failed to save category preferences.");
+        } finally {
+            setIsSavingCategories(false);
+        }
     };
 
     const handleManageSubscription = async () => {
@@ -128,6 +156,38 @@ export default function ProfilePage() {
                             <span>Lifetime Hero</span>
                         </div>
                     )}
+                </div>
+
+                {/* Tracked Categories Section */}
+                <div className="profile-card categories-card">
+                    <div className="card-header">
+                        <Layers size={20} className="text-primary" />
+                        <h3>Tracked Categories</h3>
+                    </div>
+                    <p className="text-muted text-sm" style={{ marginBottom: '1.5rem' }}>
+                        Select the types of applications you want to track on your dashboard.
+                    </p>
+                    <div className="categories-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+                        {(Object.entries(CATEGORIES) as [CategoryId, typeof CATEGORIES[keyof typeof CATEGORIES]][]).map(([id, cat]) => {
+                            const isChecked = user.enabledCategories.includes(id);
+                            const Icon = id === 'job' ? Briefcase : id === 'housing' ? Home : id === 'school' ? GraduationCap : Award;
+                            return (
+                                <label key={id} className={`category-toggle ${isChecked ? 'active' : ''}`} style={{
+                                    display: 'flex', alignItems: 'center', gap: '8px', padding: '12px', borderRadius: '8px', border: isChecked ? '1px solid var(--primary-color)' : '1px solid var(--border-color)', background: isChecked ? 'rgba(56, 189, 248, 0.05)' : 'var(--card-hover)', cursor: 'pointer', transition: 'all 0.2s'
+                                }}>
+                                    <input 
+                                        type="checkbox" 
+                                        checked={isChecked}
+                                        onChange={() => handleToggleCategory(id)}
+                                        style={{ accentColor: 'var(--primary-color)', width: '16px', height: '16px', cursor: 'pointer' }}
+                                    />
+                                    <Icon size={16} className={isChecked ? 'text-primary' : 'text-muted'} />
+                                    <span style={{ fontSize: '0.9rem', color: isChecked ? 'var(--text-primary)' : 'var(--text-secondary)', fontWeight: isChecked ? 500 : 400 }}>{cat.label}</span>
+                                </label>
+                            );
+                        })}
+                    </div>
+                    {isSavingCategories && <div className="text-sm text-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Loader2 size={14} className="animate-spin" /> Saving preferences...</div>}
                 </div>
 
                 {/* Forwarding Section */}

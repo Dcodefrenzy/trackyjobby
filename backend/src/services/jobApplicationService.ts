@@ -5,13 +5,24 @@ import { JobData } from '../utils/llmParser';
  * Handles the logic for matching/inserting a company, checking for existing
  * duplicate applications, and inserting/updating the job application and interviews.
  */
-export async function processJobApplication(userId: string, jobData: JobData, _fallbackIgnored?: string) {
+export async function processJobApplication(userId: string, jobData: JobData, existingJobId?: string) {
     const jobTitle = jobData.jobTitle || 'Unknown';
+    const companyName = jobData.companyName || 'Unknown Entity';
     // ─── Resolve Company ───
     let companyId;
 
-    // Try matching by domain first (it's more reliable than name)
-    if (jobData.companyDomain) {
+    if (existingJobId) {
+        // Find existing company_id if we have an ID
+        const { data: existingApp } = await supabase
+            .from('job_applications')
+            .select('company_id')
+            .eq('id', existingJobId)
+            .maybeSingle();
+        if (existingApp?.company_id) companyId = existingApp.company_id;
+    }
+
+    // Try matching by domain if companyId still unknown
+    if (!companyId && jobData.companyDomain) {
         const { data: domainMatch } = await supabase
             .from('companies')
             .select('id')
@@ -30,12 +41,12 @@ export async function processJobApplication(userId: string, jobData: JobData, _f
         const { data: nameMatch } = await supabase
             .from('companies')
             .select('id')
-            .ilike('name', jobData.companyName)
+            .ilike('name', companyName)
             .maybeSingle();
 
         if (nameMatch) {
             companyId = nameMatch.id;
-            console.log(`🔗 Matched company "${jobData.companyName}" by name.`);
+            console.log(`🔗 Matched company "${companyName}" by name.`);
         }
     }
 
@@ -45,7 +56,7 @@ export async function processJobApplication(userId: string, jobData: JobData, _f
         const { data: newCompany, error: companyErr } = await supabase
             .from('companies')
             .insert({
-                name: jobData.companyName,
+                name: companyName,
                 domain: jobData.companyDomain,
                 logo_url: logoUrl
             })
@@ -57,79 +68,98 @@ export async function processJobApplication(userId: string, jobData: JobData, _f
             throw companyErr;
         }
         companyId = newCompany.id;
-        console.log(`🆕 Created new company: ${jobData.companyName}`);
+        console.log(`🆕 Created new company: ${companyName}`);
     }
 
     // ─── Duplicate Check Strategy ───
-    // First, try a strict match (Company + Title)
-    const { data: strictMatches } = await supabase
-        .from('job_applications')
-        .select('id, status, job_title')
-        .eq('user_id', userId)
-        .eq('company_id', companyId)
-        .ilike('job_title', jobTitle)
-        .order('created_at', { ascending: false });
+    let existingAppId = existingJobId;
 
-    let existingJob = strictMatches?.find(j => j.status !== 'Rejected');
-
-    // If no strict active match, try to find ANY active application for this company
-    if (!existingJob) {
-        const { data: companyJobs } = await supabase
+    if (!existingAppId) {
+        // First, try a strict match (Company + Title)
+        const { data: strictMatches } = await supabase
             .from('job_applications')
             .select('id, status, job_title')
             .eq('user_id', userId)
             .eq('company_id', companyId)
-            .neq('status', 'Rejected')
+            .eq('category', jobData.category || 'job')
+            .ilike('job_title', jobTitle)
             .order('created_at', { ascending: false });
 
-        if (companyJobs && companyJobs.length > 0) {
-            existingJob = companyJobs[0];
-            console.log(`⚠️ Fuzzy match found for company ${jobData.companyName}. Using existing app: ${existingJob.id} (${existingJob.job_title})`);
+        let existingJob = strictMatches?.find(j => j.status !== 'Rejected');
+
+        // If no strict active match, try to find ANY active application for this company
+        if (!existingJob) {
+            const { data: companyJobs } = await supabase
+                .from('job_applications')
+                .select('id, status, job_title')
+                .eq('user_id', userId)
+                .eq('company_id', companyId)
+                .eq('category', jobData.category || 'job')
+                .neq('status', 'Rejected')
+                .order('created_at', { ascending: false });
+
+            if (companyJobs && companyJobs.length > 0) {
+                existingJob = companyJobs[0];
+                console.log(`⚠️ Fuzzy match found for company ${jobData.companyName}. Using existing app: ${existingJob.id} (${existingJob.job_title})`);
+            }
         }
+        
+        if (existingJob) existingAppId = existingJob.id;
     }
 
-    let targetJobId;
+    let targetJobId = existingAppId;
 
-    if (existingJob && existingJob.status !== 'Rejected') {
-        const oldStatus = existingJob.status;
-        targetJobId = existingJob.id;
-
+    // ─── Insert / Update ───
+    if (existingAppId) {
         // Update existing application
         const updateData: any = {
+            company_id: companyId,
+            category: jobData.category || 'job',
             status: jobData.status,
             salary_range: jobData.salaryRange || null,
             location_type: jobData.locationType || null,
+            notes: jobData.notes || null,
             last_updated: new Date().toISOString(),
         };
+        if (jobData.sourceUrl) {
+            updateData.source_url = jobData.sourceUrl;
+        }
 
-        // If current title is Unknown but we found a real one now, upgrade it!
-        if (existingJob.job_title === 'Unknown' && jobData.jobTitle && jobData.jobTitle !== 'Unknown') {
+        // Check current title to see if we should upgrade it
+        const { data: currentApp } = await supabase.from('job_applications').select('job_title, status').eq('id', existingAppId).single();
+        
+        if (currentApp && currentApp.job_title === 'Unknown' && jobData.jobTitle && jobData.jobTitle !== 'Unknown') {
             updateData.job_title = jobData.jobTitle;
             console.log(`✨ Upgraded job title from Unknown to: ${jobData.jobTitle}`);
+        } else if (!currentApp) {
+             updateData.job_title = jobTitle; // Fallback if record was missing?
         }
 
-        await supabase.from('job_applications').update(updateData).eq('id', targetJobId);
+        await supabase.from('job_applications').update(updateData).eq('id', existingAppId);
 
         // Record status change event if it actually changed
-        if (oldStatus !== jobData.status) {
+        if (currentApp && currentApp.status !== jobData.status) {
             await supabase.from('job_application_events').insert({
-                job_application_id: targetJobId,
+                job_application_id: existingAppId,
                 event_type: 'Status Change',
-                old_status: oldStatus,
+                old_status: currentApp.status,
                 new_status: jobData.status,
-                description: `Application status moved from ${oldStatus} to ${jobData.status}.`
+                description: `Application status moved from ${currentApp.status} to ${jobData.status}.`
             });
         }
-        console.log(`✅ Job Application Updated: ${targetJobId}`);
+        console.log(`✅ Job Application Updated: ${existingAppId}`);
     } else {
         // Insert new application
         const { data: newJob, error: jobErr } = await supabase.from('job_applications').insert({
             user_id: userId,
             company_id: companyId,
+            category: jobData.category || 'job',
             job_title: jobTitle,
             status: jobData.status,
             salary_range: jobData.salaryRange || null,
             location_type: jobData.locationType || null,
+            source_url: jobData.sourceUrl || null,
+            notes: jobData.notes || null,
             applied_date: new Date().toISOString(),
         }).select('id').single();
 

@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, CheckCircle, ArrowRight, RefreshCcw, Send, Copy, Check, Settings, MailWarning, ShieldCheck } from 'lucide-react';
-import { setupForwarder, getMe, getForwardingVerification } from '../api/client';
+import { setupForwarder, getMe, getForwardingVerification, updateCategories } from '../api/client';
+import { CATEGORIES, type CategoryId } from '../config/categories';
+import { PREDEFINED_FILTERS, SUPPORTED_LANGUAGES, type LanguageCode } from '../config/filters';
 import './EmailClientSetupPage.css';
 
-type SetupStep = 'alias' | 'client' | 'instructions' | 'verify' | 'test';
+type SetupStep = 'alias' | 'categories' | 'client' | 'instructions' | 'verify' | 'test';
 
 export default function EmailClientSetupPage() {
     const navigate = useNavigate();
@@ -16,25 +18,29 @@ export default function EmailClientSetupPage() {
     const [mockVerifyLink, setMockVerifyLink] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
     const [isCheckingUser, setIsCheckingUser] = useState(true);
-
-    const [filterOptions, setFilterOptions] = useState({
-        job: true,
-        career: true,
-        interview: true,
-        offer: true,
-        recruiter: true,
-        application: true
-    });
+    const [filterLanguage, setFilterLanguage] = useState<LanguageCode>('en');
+    const [selectedCategories, setSelectedCategories] = useState<CategoryId[]>(['job']);
+    const [checkedFilters, setCheckedFilters] = useState<string[]>([]);
+    const [isSavingCategories, setIsSavingCategories] = useState(false);
     const [customKeywords, setCustomKeywords] = useState('');
 
+    useEffect(() => {
+        // Auto-check all default filters when categories or language change
+        const allChecked = selectedCategories.flatMap(cat => PREDEFINED_FILTERS[filterLanguage][cat as CategoryId]?.map(f => f.id) || []);
+        setCheckedFilters(allChecked);
+    }, [selectedCategories, filterLanguage]);
+
     const getFilterString = () => {
-        const terms = [];
-        if (filterOptions.job) terms.push('subject:job');
-        if (filterOptions.career) terms.push('subject:career');
-        if (filterOptions.interview) terms.push('subject:interview');
-        if (filterOptions.offer) terms.push('subject:offer');
-        if (filterOptions.recruiter) terms.push('recruiter', 'hiring');
-        if (filterOptions.application) terms.push('"job application"', '"career opportunity"');
+        const terms: string[] = [];
+        
+        selectedCategories.forEach(cat => {
+            const filters = PREDEFINED_FILTERS[filterLanguage][cat as CategoryId] || [];
+            filters.forEach(f => {
+                if (checkedFilters.includes(f.id)) {
+                    terms.push(...f.keywords);
+                }
+            });
+        });
 
         if (customKeywords.trim()) {
             const keywords = customKeywords.split(',').map(k => k.trim()).filter(k => k);
@@ -47,9 +53,10 @@ export default function EmailClientSetupPage() {
     useEffect(() => {
         getMe()
             .then(data => {
+                if (data.enabledCategories) setSelectedCategories(data.enabledCategories);
                 if (data.mail_forwarder) {
                     setAlias(data.mail_forwarder);
-                    setStep('client');
+                    setStep('categories');
                 }
             })
             .catch(err => console.error("Failed to fetch user data:", err))
@@ -72,7 +79,7 @@ export default function EmailClientSetupPage() {
 
             // Overwrite their input with the fully clean lowercase alias returned from DB
             setAlias(data.user.mailForwarder);
-            setStep('client');
+            setStep('categories');
         } catch (err: any) {
             setError(err?.response?.data?.error || 'Failed to save alias. Try another one.');
         } finally {
@@ -80,7 +87,18 @@ export default function EmailClientSetupPage() {
         }
     };
 
-
+    const handleSaveCategories = async () => {
+        if (selectedCategories.length === 0) return;
+        setIsSavingCategories(true);
+        try {
+            await updateCategories(selectedCategories, selectedCategories.includes('job') ? 'job' : selectedCategories[0]);
+            setStep('client');
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsSavingCategories(false);
+        }
+    };
 
     // Poll for the Gmail verification link when the user clicks "I have added the address"
     useEffect(() => {
@@ -168,6 +186,38 @@ export default function EmailClientSetupPage() {
                             onClick={handleSaveAlias}
                         >
                             {isSimulating ? <><RefreshCcw size={16} className="spin" /> Saving...</> : <>Next <ArrowRight size={16} /></>}
+                        </button>
+                    </div>
+                )}
+
+                {step === 'categories' && (
+                    <div className="step-content animate-fade-in">
+                        <h2>What do you want to track?</h2>
+                        <p className="subtitle">Select the types of applications you'll be tracking. This helps us create the right email filters for you later.</p>
+                        
+                        <div className="filter-options" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px', marginBottom: '1.5rem', textAlign: 'left' }}>
+                            {(Object.entries(CATEGORIES) as [CategoryId, typeof CATEGORIES[keyof typeof CATEGORIES]][]).map(([id, cat]) => (
+                                <label key={id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px', background: selectedCategories.includes(id) ? 'rgba(56, 189, 248, 0.1)' : 'var(--card-bg)', border: selectedCategories.includes(id) ? '1px solid var(--primary-color)' : '1px solid var(--border-color)', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s' }}>
+                                    <input 
+                                        type="checkbox" 
+                                        checked={selectedCategories.includes(id)} 
+                                        onChange={(e) => {
+                                            if (e.target.checked) setSelectedCategories([...selectedCategories, id]);
+                                            else setSelectedCategories(selectedCategories.filter(c => c !== id));
+                                        }}
+                                        style={{ accentColor: 'var(--primary-color)', width: '18px', height: '18px' }}
+                                    />
+                                    <span style={{ fontSize: '1rem', fontWeight: 500, color: selectedCategories.includes(id) ? 'var(--text-primary)' : 'var(--text-secondary)' }}>{cat.label}</span>
+                                </label>
+                            ))}
+                        </div>
+
+                        <button
+                            className="primary-btn continue-btn"
+                            disabled={selectedCategories.length === 0 || isSavingCategories}
+                            onClick={handleSaveCategories}
+                        >
+                            {isSavingCategories ? <><RefreshCcw size={16} className="spin" /> Saving...</> : <>Continue <ArrowRight size={16} /></>}
                         </button>
                     </div>
                 )}
@@ -436,38 +486,60 @@ export default function EmailClientSetupPage() {
                                 </p>
                                 <div className="warning-note" style={{ fontSize: '0.8rem', color: '#ffab00', marginBottom: '1rem', display: 'flex', gap: '8px', padding: '10px', background: 'rgba(255,171,0,0.05)', borderRadius: '6px' }}>
                                     <MailWarning size={14} style={{ flexShrink: 0, marginTop: '2px' }} />
-                                    <span><strong>Important:</strong> Global forwarding is disabled by default in Gmail even after confirming. You MUST set up a filter to actually forward your job emails!</span>
+                                    <span><strong>Important:</strong> Global forwarding is disabled by default in Gmail even after confirming. You MUST set up a filter to actually forward your emails!</span>
                                 </div>
-                                <p style={{ fontSize: '0.875rem', marginBottom: '0.75rem', opacity: 0.8 }}>
-                                    Select what kinds of emails you want to forward to TrackyJobby:
-                                </p>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                                    <p style={{ fontSize: '0.875rem', opacity: 0.8, margin: 0 }}>
+                                        Select the kinds of emails you want to forward to TrackyJobby:
+                                    </p>
+                                    <select 
+                                        value={filterLanguage} 
+                                        onChange={(e) => setFilterLanguage(e.target.value as LanguageCode)}
+                                        style={{ 
+                                            background: 'rgba(255,255,255,0.05)', 
+                                            border: '1px solid rgba(255,255,255,0.1)', 
+                                            color: 'var(--text-primary)', 
+                                            padding: '4px 8px', 
+                                            borderRadius: '4px',
+                                            fontSize: '0.8125rem',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        {SUPPORTED_LANGUAGES.map(lang => (
+                                            <option key={lang.code} value={lang.code}>{lang.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                                <div className="filter-options" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px', background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', textAlign: 'left' }}>
-                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', cursor: 'pointer' }}>
-                                        <input type="checkbox" checked={filterOptions.job} onChange={e => setFilterOptions({ ...filterOptions, job: e.target.checked })} /> Job
-                                    </label>
-                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', cursor: 'pointer' }}>
-                                        <input type="checkbox" checked={filterOptions.career} onChange={e => setFilterOptions({ ...filterOptions, career: e.target.checked })} /> Career
-                                    </label>
-                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', cursor: 'pointer' }}>
-                                        <input type="checkbox" checked={filterOptions.interview} onChange={e => setFilterOptions({ ...filterOptions, interview: e.target.checked })} /> Interview
-                                    </label>
-                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', cursor: 'pointer' }}>
-                                        <input type="checkbox" checked={filterOptions.offer} onChange={e => setFilterOptions({ ...filterOptions, offer: e.target.checked })} /> Offer
-                                    </label>
-                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', cursor: 'pointer' }}>
-                                        <input type="checkbox" checked={filterOptions.recruiter} onChange={e => setFilterOptions({ ...filterOptions, recruiter: e.target.checked })} /> Recruiter / Hiring
-                                    </label>
-                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', cursor: 'pointer' }}>
-                                        <input type="checkbox" checked={filterOptions.application} onChange={e => setFilterOptions({ ...filterOptions, application: e.target.checked })} /> Application terms
-                                    </label>
+                                <div className="filter-options-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '8px', marginBottom: '8px', background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', textAlign: 'left' }}>
+                                    {selectedCategories.map((cat) => {
+                                        const filters = PREDEFINED_FILTERS[filterLanguage][cat as CategoryId] || [];
+                                        return filters.map(f => (
+                                            <label key={f.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', cursor: 'pointer' }}>
+                                                <input 
+                                                    type="checkbox" 
+                                                    checked={checkedFilters.includes(f.id)} 
+                                                    onChange={(e) => {
+                                                        if (e.target.checked) setCheckedFilters([...checkedFilters, f.id]);
+                                                        else setCheckedFilters(checkedFilters.filter(id => id !== f.id));
+                                                    }} 
+                                                    style={{ accentColor: 'var(--primary-color)' }}
+                                                />
+                                                <span style={{ color: 'var(--text-primary)' }}>{f.label}</span>
+                                            </label>
+                                        ));
+                                    })}
                                 </div>
+
                                 <div style={{ marginBottom: '1rem', textAlign: 'left' }}>
+                                    <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '8px' }}>
+                                        <strong>Tip:</strong> You can also add email addresses or domains of platforms you usually get your applications from (like `no-reply@greenhouse.io`, `info@zillow.com`, etc).
+                                    </p>
                                     <input
                                         type="text"
                                         value={customKeywords}
                                         onChange={(e) => setCustomKeywords(e.target.value)}
-                                        placeholder="Add custom keywords (comma separated)"
+                                        placeholder="Add custom keywords, emails, or websites (comma separated)"
                                         style={{
                                             width: '100%',
                                             padding: '8px 12px',
