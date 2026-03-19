@@ -33,23 +33,23 @@ export default function LandingPage() {
             {/* Hero Section */}
             <header className="hero-section">
                 <div className="hero-content">
-                    <div className="badge-glow animate-fade-in">Now in Beta — v1.0</div>
+                    <div className="badge-glow animate-fade-in">Now in Beta — v1.0.2</div>
                     <h1 className="hero-title animate-fade-in">
                         Applications are messy.<br />
-                        <span>TrackyJobby</span> tracks your jobs, apartments, and schools automatically.
+                        <span>TrackyJobby</span> tracks your life in one click.
                     </h1>
                     <p className="hero-subtitle animate-fade-in" style={{ maxWidth: '800px' }}>
-                        TrackyJobby was created to help you manage and track all your applications in one simple place.
-                        Whether it's for a new job, an apartment, a university program, or a scholarship, TrackyJobby automatically
-                        organizes your progress and keeps everything up to date.
-                    </p>
-                    <p className="hero-subtitle animate-fade-in" style={{ marginTop: '-1.5rem', fontWeight: 500, color: 'var(--text-primary)' }}>
-                        Focus on landing the opportunity — TrackyJobby handles the tracking.
+                        The first universal tracker for your **career, housing, and education**. 
+                        Whether it's a dream job, a new apartment, or a master's program, 
+                        TrackyJobby organizes everything automatically.
                     </p>
                     <div className="hero-actions animate-fade-in">
                         <Link to="/auth/register" className="btn-primary">
-                            Start Tracking <ChevronRight size={18} />
+                            Get Started Free <ChevronRight size={18} />
                         </Link>
+                        <a href="#" className="btn-secondary">
+                          <Zap size={18} /> Get the Extension
+                        </a>
                     </div>
                 </div>
 
@@ -63,43 +63,53 @@ export default function LandingPage() {
                         </div>
                         <div className="preview-content">
                             <div className="preview-header flex-between">
-                                <div className="p-title">Job Applications</div>
-                                <div className="p-badge">3 tracked</div>
+                                <div className="p-title">Your Applications</div>
+                                <div className="p-badge flex-center gap-1">✨ Universal Sync</div>
                             </div>
                             <div className="preview-metrics">
                                 <div className="p-metric-card glass">
-                                    <div className="p-m-label">Applied</div>
+                                    <div className="p-m-label">Job Apps</div>
                                     <div className="p-m-value">12</div>
                                 </div>
                                 <div className="p-metric-card glass">
-                                    <div className="p-m-label">Interviews</div>
-                                    <div className="p-m-value text-info">2</div>
+                                    <div className="p-m-label">Housing</div>
+                                    <div className="p-m-value text-info">3</div>
                                 </div>
                                 <div className="p-metric-card glass">
-                                    <div className="p-m-label">Offers</div>
-                                    <div className="p-m-value text-success">1</div>
+                                    <div className="p-m-label">Schools</div>
+                                    <div className="p-m-value text-success">2</div>
                                 </div>
                             </div>
                             <div className="preview-grid">
-                                <div className="p-job-card glass">
+                                <div className="p-job-card glass active-glow">
                                     <div className="p-j-header">
                                         <div className="p-j-logo bg-purple-600">S</div>
                                         <div>
                                             <div className="p-j-company">Stripe</div>
-                                            <div className="p-j-title">Fullstack Engineer</div>
+                                            <div className="p-j-title">Software Engineer</div>
                                         </div>
                                     </div>
                                     <div className="p-j-status status-applied">Applied</div>
                                 </div>
-                                <div className="p-job-card glass active-glow">
+                                <div className="p-job-card glass">
                                     <div className="p-j-header">
-                                        <div className="p-j-logo bg-emerald-500">O</div>
+                                        <div className="p-j-logo bg-blue-500">H</div>
                                         <div>
-                                            <div className="p-j-company">OpenAI</div>
-                                            <div className="p-j-title">Frontend Lead</div>
+                                            <div className="p-j-company">Hudson Yards</div>
+                                            <div className="p-j-title">2BR Apartment</div>
                                         </div>
                                     </div>
-                                    <div className="p-j-status status-interview">Interviewing</div>
+                                    <div className="p-j-status status-interview">Viewing Set</div>
+                                </div>
+                                <div className="p-job-card glass">
+                                    <div className="p-j-header">
+                                        <div className="p-j-logo bg-amber-600">U</div>
+                                        <div>
+                                            <div className="p-j-company">Stanford Univ.</div>
+                                            <div className="p-j-title">Computer Science</div>
+                                        </div>
+                                    </div>
+                                    <div className="p-j-status status-applied">In Review</div>
                                 </div>
                             </div>
                         </div>
@@ -110,38 +120,38 @@ export default function LandingPage() {
             {/* Features Grid */}
             <section className="features-section">
                 <div className="section-intro">
-                    <h2 className="section-title">Everything you need to stay organized</h2>
-                    <p className="section-subtitle">Focus on your interviews while we handle the data entry.</p>
+                    <h2 className="section-title">Everything you need to land it</h2>
+                    <p className="section-subtitle">Focus on your goals while we handle the data entry.</p>
                 </div>
 
                 <div className="features-grid">
                     <div className="feature-card glass">
                         <div className="feature-icon bg-info-light">
-                            <Mail size={24} className="text-info" />
+                            <Zap size={24} className="text-info" />
                         </div>
-                        <h3>Gmail Integration</h3>
-                        <p>Forward job emails and we'll automatically parse company, title, and salary data.</p>
+                        <h3>One-Click Extension</h3>
+                        <p>Our powerful Chrome extension scans listings on any site and saves them instantly.</p>
                     </div>
                     <div className="feature-card glass">
                         <div className="feature-icon bg-success-light">
-                            <BarChart3 size={24} className="text-success" />
+                            <Mail size={24} className="text-success" />
                         </div>
-                        <h3>Application Journey</h3>
-                        <p>Visual timelines of every status update, from first applied to signed offer.</p>
+                        <h3>Universal Support</h3>
+                        <p>Built-in intelligence to track Jobs, Apartments, Schools, and Scholarships.</p>
                     </div>
                     <div className="feature-card glass">
                         <div className="feature-icon bg-warning-light">
-                            <Zap size={24} className="text-warning" />
+                            <BarChart3 size={24} className="text-warning" />
                         </div>
-                        <h3>Real-time Metrics</h3>
-                        <p>Track your conversion rates and see exactly where you are in the pipeline.</p>
+                        <h3>Visual Journey</h3>
+                        <p>Beautiful timelines of every status update, from first click to signed contract.</p>
                     </div>
                     <div className="feature-card glass">
                         <div className="feature-icon bg-primary-light">
                             <ShieldCheck size={24} className="text-primary" />
                         </div>
                         <h3>Privacy First</h3>
-                        <p>Your data is encrypted and secure. We track your journey, not your life.</p>
+                        <p>Your data is encrypted and secure. We track your progress, not your life.</p>
                     </div>
                 </div>
             </section>
