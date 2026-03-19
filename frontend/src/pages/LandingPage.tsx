@@ -210,7 +210,7 @@ export default function LandingPage() {
                         <span>TrackyJobby</span>
                     </div>
                     <div className="footer-links gap-8 flex-center">
-                        <a href="#">Privacy</a>
+                        <Link to="/privacy">Privacy</Link>
                         <a href="#">Terms</a>
                         <a href="mailto:hello@trackyjobby.com">Contact</a>
                     </div>

@@ -8,6 +8,7 @@ import EmailClientSetupPage from './pages/EmailClientSetupPage.tsx';
 import VerifyForwardingPage from './pages/VerifyForwardingPage.tsx';
 import VerifyPage from './pages/VerifyPage.tsx';
 import PlanSelectionPage from './pages/PlanSelectionPage.tsx';
+import PrivacyPage from './pages/PrivacyPage.tsx';
 import RequireSubscription from './components/RequireSubscription.tsx';
 import { AuthProvider } from './hooks/AuthProvider.tsx';
 import { useAuth } from './hooks/useAuth.ts';
@@ -51,6 +52,7 @@ function App() {
           <Route path="/auth/register" element={<AuthPage />} />
           <Route path="/verify/:token" element={<VerifyPage />} />
           <Route path="/plan-selection" element={<PlanSelectionPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
 
           {/* Protected Routes */}
           <Route path="/*" element={<AppShell />} />
